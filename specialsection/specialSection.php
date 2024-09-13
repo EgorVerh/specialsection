@@ -28,31 +28,12 @@ class SpecialSection extends \yii\base\Module implements BootstrapInterface
     public function bootstrap($app)
     {
         $app->getUrlManager()->addRules([
-        '/form1'                                                   => 'takedatam/default/index',
-        '/form2'                                                   => 'takedatam/default/form2',
-        '/form3'                                                   => 'takedatam/default/form3',
-        '/form4'                                                   => 'takedatam/default/form4',
-        '/paid_edu'                                                => 'takedatam/default/paidedu',
-        '/grantsold'                                               => 'takedatam/default/grantsold',
-        '/grants'                                                  => 'takedatam/default/grants',
-        '/document'                                                => 'takedatam/default/document',
-        // '/common'                                                  => 'takedatam/default/common',
-        '/eduStandarts'                                            => 'takedatam/default/edustandarts',
-        '/inter'                                                   => 'takedatam/default/inter',
-        '/budget'                                                  => 'takedatam/default/budget',
-        '/objects'                                                 => 'takedatam/default/objects',
-        '/catering'                                                => 'takedatam/default/catering',
-        '/education'                                               => 'takedatam/default/education',
-        '/upload'                                                  => 'takedatam/default/upload',
-        '/deleteform2'                                             => 'takedatam/default/deleteform2',
-        '/deleteform3'                                             => 'takedatam/default/deleteform3',
-        '/deleteform4'                                             => 'takedatam/default/deleteform4',
-        '/delete_paid_edu'                                         => 'takedatam/default/deletepaidedu',
-        '/delete_grants'                                           => 'takedatam/default/deletegrants',
-        '/delete_document'                                         => 'takedatam/default/deletedocument',
-        '/delete_inter'                                            => 'takedatam/default/deleteinter',
-        '/delete_budget'                                           => 'takedatam/default/deletebudget',
-        '/delete_objects'                                          => 'takedatam/default/deleteobjects',
+        '/delete_paid_edu'                                         => 'specialsection/section/deletepaidedu',
+        '/delete_grants'                                           => 'specialsection/section/deletegrants',
+        '/delete_document'                                         => 'specialsection/section/deletedocument',
+        '/delete_inter'                                            => 'specialsection/section/deleteinter',
+        '/delete_budget'                                           => 'specialsection/section/deletebudget',
+        '/delete_objects'                                          => 'specialsection/section/deleteobjects',
         ], false);
     }
 }
