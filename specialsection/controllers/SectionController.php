@@ -1428,7 +1428,7 @@ class SectionController extends Controller
                             if (!empty($dop)) {
                                 if (!empty($dop[$number]["data"])) {
                                     if ($dop[$number]["data"] != $inter_dop) {
-                                        $change = $extrafields::findOne(["data" => $dop[$number]["data"]]);
+                                        $change = $extrafields::findOne($dop[$number]["id"]);
                                         $change->data = $inter_dop;
                                         $change->save();
                                         $change = Dataforms::findOne($inter[0][0]);
