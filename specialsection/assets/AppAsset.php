@@ -8,14 +8,12 @@ use yii\web\View;
 
 class AppAsset extends AssetBundle
 {
-    public $sourcePath="@modulestakedatamroot";
-    public $basePath = '@webroot/assets';
-    public $baseUrl = '@web/assets';
+    public $sourcePath='@module_specialsection_root';
     public $css = [
-        // 'css/site.css',
+        //'css/styles.css',
     ];  
     public $js = [
-        // '/js/form2.js'
+        //'/js/form2.js'
     ];
     public $jsOptions = [
         // скрипты будут подключены в <head>
