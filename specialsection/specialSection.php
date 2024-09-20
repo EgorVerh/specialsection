@@ -20,20 +20,23 @@ class SpecialSection extends \yii\base\Module implements BootstrapInterface
     public function init()
     {
         parent::init();
-        \Yii::setAlias('@modulestakedatamroot', '/home/vagrant/test/portal_local_repo/app/frontend/modules/specialsection/public');
-        \Yii::setAlias('@modulestakedatamscript','@web/assets/92b8fded/js');
-        \Yii::setAlias('@modulestakedatamcss','@web/assets/92b8fded/css');
+        $this->params = require __DIR__ . '/config/params.php';
+        \Yii::setAlias('@module_specialsection_root', '@app/modules/specialsection/assets');
+        $assetManager = \Yii::$app->assetManager;
+        $publishedUrl = $assetManager->getPublishedUrl('@app/modules/specialsection/public');
+        \Yii::setAlias('@module_specialsection_js', $publishedUrl . '/js');
+        \Yii::setAlias('@module_specialsection_css', $publishedUrl . '/css');
         // custom initialization code goes here
     }
     public function bootstrap($app)
     {
         $app->getUrlManager()->addRules([
-        '/delete_paid_edu'                                         => 'specialsection/section/deletepaidedu',
-        '/delete_grants'                                           => 'specialsection/section/deletegrants',
-        '/delete_document'                                         => 'specialsection/section/deletedocument',
-        '/delete_inter'                                            => 'specialsection/section/deleteinter',
-        '/delete_budget'                                           => 'specialsection/section/deletebudget',
-        '/delete_objects'                                          => 'specialsection/section/deleteobjects',
-        ], false);
+            '/delete_paid_edu'                                         => 'specialsection/section/deletepaidedu',
+            '/delete_grants'                                           => 'specialsection/section/deletegrants',
+            '/delete_document'                                         => 'specialsection/section/deletedocument',
+            '/delete_inter'                                            => 'specialsection/section/deleteinter',
+            '/delete_budget'                                           => 'specialsection/section/deletebudget',
+            '/delete_objects'                                          => 'specialsection/section/deleteobjects',
+            ], false);
     }
 }

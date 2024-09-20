@@ -236,10 +236,10 @@ class SectionController extends Controller
     {
         $request = Yii::$app->request;
         $savefilestable = Savefiles::find()->all();
-        $key = Yii::$app->params['key'];
-        $secret = Yii::$app->params['secret'];
-        $endpoint = Yii::$app->params['endpoint'];
-        $bucket = Yii::$app->params['Bucket'];
+        $key = $this->module->params['key'];
+        $secret = $this->module->params['secret'];
+        $endpoint = $this->module->params['endpoint'];
+        $bucket = $this->module->params['Bucket'];
         if (isset($_FILES['upload_file'])) {
             $savefilestable = Savefiles::find()->all();
             foreach ($_FILES['upload_file']['name'] as $file => $name) {
@@ -397,10 +397,10 @@ class SectionController extends Controller
             ->andWhere(['fieldsforms.nameform' => 'paid_edu'])
             ->all();
         $request = Yii::$app->request;
-        $key = Yii::$app->params['key'];
-        $secret = Yii::$app->params['secret'];
-        $endpoint = Yii::$app->params['endpoint'];
-        $bucket = Yii::$app->params['Bucket'];
+        $key = $this->module->params['key'];
+        $secret = $this->module->params['secret'];
+        $endpoint = $this->module->params['endpoint'];
+        $bucket = $this->module->params['Bucket'];
         //массив с разрешенными расширениями файлов
         $acTypesFileForUploading = array(
             "image/jpeg",//jpg or jpeg
@@ -670,10 +670,10 @@ class SectionController extends Controller
     {
         $takedata = new Dataforms();
         $request = Yii::$app->request;
-        $key = Yii::$app->params['key'];
-        $secret = Yii::$app->params['secret'];
-        $endpoint = Yii::$app->params['endpoint'];
-        $bucket = Yii::$app->params['Bucket'];
+        $key = $this->module->params['key'];
+        $secret = $this->module->params['secret'];
+        $endpoint = $this->module->params['endpoint'];
+        $bucket = $this->module->params['Bucket'];
         //массив с разрешенными расширениями файлов
         $acTypesFileForUploading = array(
             "image/jpeg",//jpg or jpeg
@@ -1036,10 +1036,10 @@ class SectionController extends Controller
 
             }
             $request = Yii::$app->request;
-            $key = Yii::$app->params['key'];
-            $secret = Yii::$app->params['secret'];
-            $endpoint = Yii::$app->params['endpoint'];
-            $bucket = Yii::$app->params['Bucket'];
+            $key = $this->module->params['key'];
+            $secret = $this->module->params['secret'];
+            $endpoint = $this->module->params['endpoint'];
+            $bucket = $this->module->params['Bucket'];
             //массив с разрешенными расширениями файлов
             $acTypesFileForUploading = array(
                 "image/jpeg",//jpg or jpeg
@@ -1226,10 +1226,10 @@ class SectionController extends Controller
             ->andWhere(['fieldsforms.nameform' => 'edustandarts'])
             ->all();
         $request = Yii::$app->request;
-        $key = Yii::$app->params['key'];
-        $secret = Yii::$app->params['secret'];
-        $endpoint = Yii::$app->params['endpoint'];
-        $bucket = Yii::$app->params['Bucket'];
+        $key = $this->module->params['key'];
+        $secret = $this->module->params['secret'];
+        $endpoint = $this->module->params['endpoint'];
+        $bucket = $this->module->params['Bucket'];
         //массив с разрешенными расширениями файлов
         $acTypesFileForUploading = array(
             "image/jpeg",//jpg or jpeg
@@ -1484,10 +1484,10 @@ class SectionController extends Controller
     public function actionGrants()
     {
         $request = Yii::$app->request;
-        $key = Yii::$app->params['key'];
-        $secret = Yii::$app->params['secret'];
-        $endpoint = Yii::$app->params['endpoint'];
-        $bucket = Yii::$app->params['Bucket'];
+        $key = $this->module->params['key'];
+        $secret = $this->module->params['secret'];
+        $endpoint = $this->module->params['endpoint'];
+        $bucket = $this->module->params['Bucket'];
         //массив с разрешенными расширениями файлов
         $acTypesFileForUploading = array(
             "image/jpeg",//jpg or jpeg
@@ -1717,10 +1717,10 @@ class SectionController extends Controller
     public function actionBudget()
     {
         $request = Yii::$app->request;
-        $key = Yii::$app->params['key'];
-        $secret = Yii::$app->params['secret'];
-        $endpoint = Yii::$app->params['endpoint'];
-        $bucket = Yii::$app->params['Bucket'];
+        $key = $this->module->params['key'];
+        $secret = $this->module->params['secret'];
+        $endpoint = $this->module->params['endpoint'];
+        $bucket = $this->module->params['Bucket'];
         //массив с разрешенными расширениями файлов
         $acTypesFileForUploading = array(
             "image/jpeg",//jpg or jpeg
@@ -2312,10 +2312,10 @@ class SectionController extends Controller
                     }
                 }
             }
-            $key = Yii::$app->params['key'];
-            $secret = Yii::$app->params['secret'];
-            $endpoint = Yii::$app->params['endpoint'];
-            $bucket = Yii::$app->params['Bucket'];
+            $key = $this->module->params['key'];
+            $secret = $this->module->params['secret'];
+            $endpoint = $this->module->params['endpoint'];
+            $bucket = $this->module->params['Bucket'];
             //массив с разрешенными расширениями файлов
             $acTypesFileForUploading = array(
                 "image/jpeg",//jpg or jpeg
@@ -2699,10 +2699,10 @@ class SectionController extends Controller
                             $del->delete();
                         } else {
                             if (!$request->post('enabled')) {
-                                $key = Yii::$app->params['key'];
-                                $secret = Yii::$app->params['secret'];
-                                $endpoint = Yii::$app->params['endpoint'];
-                                $bucket = Yii::$app->params['Bucket'];
+                                $key = $this->module->params['key'];
+                                $secret = $this->module->params['secret'];
+                                $endpoint = $this->module->params['endpoint'];
+                                $bucket = $this->module->params['Bucket'];
                                 $s3 = new S3Client([
                                     'version' => 'latest',
                                     'region' => 'msk',
@@ -2790,10 +2790,10 @@ class SectionController extends Controller
                 if ($table['data'] == '') {
                     $table->delete();
                 } else {
-                    $key = Yii::$app->params['key'];
-                    $secret = Yii::$app->params['secret'];
-                    $endpoint = Yii::$app->params['endpoint'];
-                    $bucket = Yii::$app->params['Bucket'];
+                    $key = $this->module->params['key'];
+                    $secret = $this->module->params['secret'];
+                    $endpoint = $this->module->params['endpoint'];
+                    $bucket = $this->module->params['Bucket'];
                     $s3 = new S3Client([
                         'version' => 'latest',
                         'region' => 'msk',
