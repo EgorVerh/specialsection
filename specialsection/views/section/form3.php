@@ -5,8 +5,8 @@ use frontend\modules\specialsection\assets\AppAsset;
 
 AppAsset::register($this);
 $this->registerJsFile('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
-$this->registerJsFile('@modulestakedatamscript/form3.js');
-$this->registerCssFile('@modulestakedatamcss/styles.css');
+$this->registerJsFile('@module_specialsection_js/form3.js');
+$this->registerCssFile('@module_specialsection_css/styles.css');
 ?>
 
 <h2>Редактирование страницы</h2>

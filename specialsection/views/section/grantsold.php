@@ -4,9 +4,9 @@ use yii\helpers\Html;
 use frontend\modules\specialsection\assets\AppAsset;
 AppAsset::register($this);
 $this->registerJsFile('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
-$this->registerJsFile('@modulestakedatamscript/paid_edu.js');
-$this->registerCssFile('@modulestakedatamcss/styles.css');
-// $this->registerCssFile('@modulestakedatamcss/styles.css');
+$this->registerJsFile('@module_specialsection_js/paid_edu.js');
+$this->registerCssFile('@module_specialsection_css/styles.css');
+// $this->registerCssFile('@module_specialsection_css/styles.css');
 ?>
 
 <head>

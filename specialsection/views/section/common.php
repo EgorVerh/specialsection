@@ -4,8 +4,8 @@ use yii\helpers\Html;
 use frontend\modules\specialsection\assets\AppAsset;
 AppAsset::register($this);
 $this->registerJsFile('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
-$this->registerCssFile('@modulestakedatamcss/styles.css');
-$this->registerJsFile('@modulestakedatamscript/document.js');
+$this->registerCssFile('@module_specialsection_css/styles.css');
+$this->registerJsFile('@module_specialsection_js/document.js');
 ?>
 
 <head>
@@ -31,7 +31,7 @@ $this->registerJsFile('@modulestakedatamscript/document.js');
                             <path
                                 d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы внесены в шаблон</p>
                     </div>
                 </td>
@@ -345,7 +345,7 @@ $this->registerJsFile('@modulestakedatamscript/document.js');
                             <path
                                 d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы внесены в шаблон</p>
                     </div>
                 </td>
@@ -376,7 +376,7 @@ $this->registerJsFile('@modulestakedatamscript/document.js');
                             </path>
                         </svg>
 
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы выгружаются из 1C</p>
                     </div>
                 </td>
@@ -403,7 +403,7 @@ $this->registerJsFile('@modulestakedatamscript/document.js');
                             <path
                                 d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы внесены в шаблон</p>
                     </div>
                 </td>
@@ -430,7 +430,7 @@ $this->registerJsFile('@modulestakedatamscript/document.js');
                             <path
                                 d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы внесены в шаблон</p>
                     </div>
                 </td>
@@ -457,7 +457,7 @@ $this->registerJsFile('@modulestakedatamscript/document.js');
                             <path
                                 d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы внесены в шаблон</p>
                     </div>
                 </td>
@@ -484,7 +484,7 @@ $this->registerJsFile('@modulestakedatamscript/document.js');
                             <path
                                 d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы внесены в шаблон</p>
                     </div>
                 </td>

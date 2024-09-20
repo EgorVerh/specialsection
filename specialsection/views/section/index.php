@@ -5,7 +5,7 @@
 use yii\helpers\Html;
 use frontend\modules\specialsection\assets\AppAsset;
 AppAsset::register($this);
-$this->registerCssFile('@modulestakedatamcss/styles.css');
+$this->registerCssFile('@module_specialsection_css/styles.css');
 ?>
 <div class="takedatam">
     <h2 class="h2_center">Редактирование страницы</h2>

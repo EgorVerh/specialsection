@@ -4,8 +4,8 @@ use yii\helpers\Html;
 use frontend\modules\specialsection\assets\AppAsset;
 AppAsset::register($this);
 $this->registerJsFile('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
-$this->registerCssFile('@modulestakedatamcss/styles.css');
-$this->registerJsFile('@modulestakedatamscript/document.js');
+$this->registerCssFile('@module_specialsection_css/styles.css');
+$this->registerJsFile('@module_specialsection_js/document.js');
 ?>
 
 <head>

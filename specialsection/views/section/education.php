@@ -4,11 +4,10 @@ use yii\helpers\Html;
 use frontend\modules\specialsection\assets\AppAsset;
 AppAsset::register($this);
 $this->registerJsFile('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
-$this->registerJsFile('@modulestakedatamscript/document.js');
-$this->registerJsFile('@modulestakedatamscript/education.js');
-$this->registerCssFile('@modulestakedatamcss/styles.css')
+$this->registerJsFile('@module_specialsection_js/document.js');
+$this->registerJsFile('@module_specialsection_js/education.js');
+$this->registerCssFile('@module_specialsection_css/styles.css')
     ?>
-
 <head>
     <title>Образование</title>
 </head>
@@ -384,7 +383,7 @@ $this->registerCssFile('@modulestakedatamcss/styles.css')
                             </path>
                         </svg>
 
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы выгружаются из 1C</p>
                     </div>
                 </td>
@@ -414,7 +413,7 @@ $this->registerCssFile('@modulestakedatamcss/styles.css')
                             <path
                                 d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы внесены в шаблон</p>
                     </div>
                 </td>
@@ -444,7 +443,7 @@ $this->registerCssFile('@modulestakedatamcss/styles.css')
                             <path
                                 d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z" />
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы внесены в шаблон</p>
                     </div>
                 </td>
@@ -489,7 +488,7 @@ $this->registerCssFile('@modulestakedatamcss/styles.css')
                                 d="M17,17c-1.103,0-2-0.897-2-2s0.897-2,2-2s2,0.897,2,2h2c0-2.206-1.794-4-4-4s-4,1.794-4,4 s1.794,4,4,4h13v-2H17z">
                             </path>
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы выгружаются из 1C</p>
                     </div>
                 </td>
@@ -532,7 +531,7 @@ $this->registerCssFile('@modulestakedatamcss/styles.css')
                                 d="M17,17c-1.103,0-2-0.897-2-2s0.897-2,2-2s2,0.897,2,2h2c0-2.206-1.794-4-4-4s-4,1.794-4,4 s1.794,4,4,4h13v-2H17z">
                             </path>
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы выгружаются из 1C</p>
                     </div>
                 </td>
@@ -570,7 +569,7 @@ $this->registerCssFile('@modulestakedatamcss/styles.css')
                                 d="M17,17c-1.103,0-2-0.897-2-2s0.897-2,2-2s2,0.897,2,2h2c0-2.206-1.794-4-4-4s-4,1.794-4,4 s1.794,4,4,4h13v-2H17z">
                             </path>
                         </svg>
-                        <p>ВНИМАИЕ !</p>
+                        <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы выгружаются из 1C</p>
                     </div>
                 </td>
