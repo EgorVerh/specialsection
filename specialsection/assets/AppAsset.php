@@ -10,7 +10,7 @@ class AppAsset extends AssetBundle
 {
     public $sourcePath='@module_specialsection_root';
     public $css = [
-        'css/styles.css',
+        '/css/styles.css',
     ];  
     public $js = [
         //'/js/form2.js'
