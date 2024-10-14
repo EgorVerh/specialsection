@@ -2,6 +2,7 @@
 
 use yii\db\Migration;
 use common\models\Role;
+use frontend\modules\specialsection\classes\Section;
 
 /**
  * Class m241009_135111_add_default_roles
@@ -13,23 +14,17 @@ class m241009_135111_add_default_roles extends Migration
      */
     public function safeUp()
     {
+        $sections = Section::getSections();
+        $roles = [];
+        foreach ($sections as $section) {
+            $roles[] = ['editor_' . $section];
+        }
 
         \Yii::$app->db->createCommand()
                      ->batchInsert(
                          Role::tableName(),
                          ['name'],
-                         [
-                             ['editor_paidedu'],
-                             ['editor_grants'],
-                             ['editor_document'],
-                             ['editor_common'],
-                             ['editor_edustandarts'],
-                             ['editor_inter'],
-                             ['editor_budget'],
-                             ['editor_objects'],
-                             ['editor_catering'],
-                             ['editor_education'],
-                         ]
+                         $roles
                      )
                      ->execute();
     }

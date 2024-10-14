@@ -23,28 +23,94 @@ use Aws\S3\ObjectUploader;
 use Aws\S3\MultipartUploader;
 use Aws\Exception\MultipartUploadException;
 
+use frontend\modules\specialsection\classes\Section;
+use common\models\user;
+
 /**
  * Default controller for the `newmodules` module
  */
+
+
 class SectionController extends Controller
 {
-    public function init()
-    {
-        parent::init();
-        $this->view->params['MenuSectionsWidget'] = MenuSectionsWidget::widget();
-    }
+
+    protected $userRoles = [];
 
     public function beforeAction($action)
     {
-        // if ($action->id == 'paid_edu') {
-        //     $this->enableCsrfValidation = false;
+        $userId = Yii::$app->user->id;
+
+        $sections = Section::getSections();
+
+        $access = [
+            Section::PAIDEDU => 'paidedu',
+            Section::GRANTS => 'grants',
+            Section::DOCUMENT => 'document',
+            Section::COMMON => 'common',
+            Section::EDUSTANDARTS => 'eduStandarts',
+            Section::INTER => 'inter',
+            Section::BUDGET => 'budget',
+            Section::OBJECTS => 'objects',
+            Section::CATERING => 'catering',
+            Section::EDUCATION => 'education',
+        ];
+        //var_dump(in_array($action->id, array_keys($access)));
+        //var_dump(array_keys($access));
+        //die();
+        //var_dump($this->userRoles);
+        //die();
+        if (in_array($action->id, array_keys($access))) {
+            //$userId = Yii::$app->user->id;
+            $user = User::findOne($userId);
+
+            $section = $access[$action->id];
+
+            $roleName = 'editor_' . $section;
+
+            if ($user->isInRole($roleName)) {
+                $trimmedNamesInRoles = SectionController::getSelfUserRoles($userId);
+                $this->userRoles = $trimmedNamesInRoles;
+                return parent::beforeAction($action);
+            } else {
+                throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+            }
+        } else if ($action->id == 'index') {
+            return parent::beforeAction($action);
+        } else {
+            throw new \yii\web\NotFoundHttpException("Запрашиваемая страница не найдена.");
+        }
+        //$this->userRoles = $trimmedNamesInRoles;
+        //var_dump($user->isInRole($roleName));
+        //die();
+        // $editorRoles = array_filter($roles, function($role) {
+        //     return strpos($role['name'], 'editor_') === 0;
+        // });
+
+        // $editorNamesInRoles = array_column($editorRoles, 'name');
+
+        // $trimmedNamesInRoles = array_map(function($name) {
+        //     return substr($name, strlen('editor_'));
+        // }, $editorNamesInRoles);
+
+        // //var_dump($trimmedNamesInRoles)
+        // $this->userRoles = $trimmedNamesInRoles;
+
+        // if (! in_array($action->id, $trimmedNamesInRoles))  {
+        //     throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
         // }
 
-        // $this->enableCsrfValidation = true; 
-        Yii::$app->request->enableCsrfValidation = true;
-
-        return parent::beforeAction($action);
+        //return parent::beforeAction($action);
     }
+
+    public function init()
+    {
+        parent::init();
+
+        $this->on(Controller::EVENT_BEFORE_ACTION, function ($event) {
+            $event->sender->view->params['userRoles'] = $this->userRoles;
+        });
+    }
+
 
     /**
      * Renders the index view for the module
@@ -104,26 +170,12 @@ class SectionController extends Controller
     }
     public function actionIndex()
     {
-        $request = Yii::$app->request;
-        $saveintable = new Dataforms();
-        $saveintable->titel = 'О полном наименовании образовательной организации';
-        $dataht = $request->get('Textarea1');
-        $saveintable->data = $dataht;
-        $saveintable->save();
-
-        $saveintable = new Dataforms();
-        $saveintable->titel = 'Сокращенное (при наличии) наименование образовательной организации';
-        $dataht = $request->get('Textarea2');
-        $saveintable->data = $dataht;
-        $saveintable->save();
-
-        $saveintable = new Dataforms();
-        $saveintable->titel = 'Дата создания образовательной организации';
-        $dataht = $request->get('Textarea3');
-        $saveintable->data = $dataht;
-        $saveintable->save();
-
-        return $this->render('index');
+        $filteredMenuItems = self::getFilteredMenuItems();
+        
+        return $this->render('index', [
+            'menuItems' => $filteredMenuItems,
+        ]);
+        //return $this->render('index',[]);
     }
     public function actionForm2()
     {
@@ -576,7 +628,8 @@ class SectionController extends Controller
             }
             return $this->redirect('');
         }
-        return $this->render('paid_edu', ['tabledata' => $data]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render('paid_edu', ['tabledata' => $data, 'menuItems' => $filteredMenuItems]);
     }
     public function actionGrantsold()
     {
@@ -1220,6 +1273,15 @@ class SectionController extends Controller
     }
     public function actionEdustandarts()
     {
+        // $takedata = new Dataforms();
+        // $data = $takedata::find()
+        //     ->joinWith('extraFields')
+        //     ->joinWith('fieldsforms')
+        //     ->all();
+        // echo "<pre>";
+        // var_dump($data);
+        // echo "</pre>";
+        // die();
         $takedata = new Dataforms();
         $data = $takedata::find()
             ->joinWith('fieldsforms')
@@ -2497,7 +2559,15 @@ class SectionController extends Controller
             ->andWhere(['between', 'fieldsforms.id', 75, 80])
             ->joinWith('extraFields')
             ->all();
-        return $this->render("education", ['tabledata' => $data,'tables'=>$tables]);
+        return $this->render("education", ['tabledata' => $data, 'tables' => $tables]);
+    }
+    public function actionCommonv()
+    {
+        $xmlFilePath = Yii::getAlias('@app/modules/specialsection/views/section/commonv.xml');
+        $xmlContent = file_get_contents($xmlFilePath);
+        Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+        Yii::$app->response->headers->add('Content-Type', 'text/xml');
+        return $xmlContent;
     }
 
     //Дальше идут удаления
@@ -2914,6 +2984,78 @@ class SectionController extends Controller
                 $table->save();
             }
         }
+    }
+
+    private function getFilteredMenuItems(){
+
+        $userId = Yii::$app->user->id;
+
+        $baseSectionUrl = '/specialsection/section/';
+        $menuItems = [];
+        $sections = Section::getSections();
+
+        $sectionLabels = [
+            'common' => 'Основные сведения',
+            'struct' => 'Структура и органы управления образовательной организацией',
+            'document' => 'Документы',
+            'education' => 'Образование',
+            'eduStandarts' => 'Образовательные стандарты и требования',
+            'managers' => 'Руководство',
+            'employees' => 'Педагогический (научно-педагогический) состав',
+            'objects' => 'Материально-техническое обеспечение и оснащенность образовательного процесса. Доступная среда',
+            'grants' => 'Стипендии и меры поддержки обучающихся',
+            'paidedu' => 'Платные образовательные услуги',
+            'budget' => 'Финансово-хозяйственная деятельность',
+            'vacant' => 'Вакантные места для приема (перевода) обучающихся',
+            'ovz' => 'Доступная среда',
+            'inter' => 'Международное сотрудничество',
+            'catering' => 'Организация питания в образовательной организации',
+        ];
+
+        foreach ($sections as $section) {
+            $url = $baseSectionUrl . $section;
+            $menuItems[$section] = [
+                'url' => $url,
+                'label' => $sectionLabels[$section],
+            ];
+        }
+
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
+
+        $filteredMenuItems = [];
+        foreach ($menuItems as $key => $item) {
+            if (in_array($key, $trimmedNamesInRoles)) {
+                $filteredMenuItems[$key] = $item;
+            }
+        }
+
+        return $filteredMenuItems;
+        //var_dump($filteredMenuItems);
+        //die();
+    }
+
+    private function getSelfUserRoles($userId)
+    {
+        $access = [
+            Section::PAIDEDU => 'paidedu',
+            Section::GRANTS => 'grants',
+            Section::DOCUMENT => 'document',
+            Section::COMMON => 'common',
+            Section::EDUSTANDARTS => 'eduStandarts',
+            Section::INTER => 'inter',
+            Section::BUDGET => 'budget',
+            Section::OBJECTS => 'objects',
+            Section::CATERING => 'catering',
+            Section::EDUCATION => 'education',
+        ];
+        $user = User::findOne($userId);
+        $trimmedNamesInRoles = [];
+        foreach ($access as $key => $role) {
+            if ($user->isInRole('editor_' . $role)) {
+                array_push($trimmedNamesInRoles, ($access[$key]));
+            }
+        }
+        return $trimmedNamesInRoles;//$this->userRoles = 
     }
 }
 

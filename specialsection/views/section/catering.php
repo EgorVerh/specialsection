@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 /** @var yii\web\View $this */
 use frontend\modules\specialsection\assets\AppAsset;
+use frontend\modules\specialsection\widgets\MenuSectionsWidget;
 AppAsset::register($this);
 $this->registerJsFile('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
 $this->registerCssFile('@module_specialsection_css/styles.css');
@@ -13,7 +14,7 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
 </head>
 
 <body>
-    <?= $this->params["MenuSectionsWidget"] ?>
+    <?= MenuSectionsWidget::widget(['userRoles' => $this->params['userRoles'],]) ?>
     <h1>Организация питания в образовательной деятельности</h1>
     <form method="post" enctype="multipart/form-data">
         <?php

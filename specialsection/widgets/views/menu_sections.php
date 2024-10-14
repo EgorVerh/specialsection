@@ -1,15 +1,20 @@
+<?php if ($type == 'htmlSelect') { ?>
 <div class="dropdown">
     <button class="dropdown-button">Меню</button>
     <div class="dropdown-content">
-        <a href="/specialsection/section/paidedu">paid_edu</a>
-        <a href="/specialsection/section/grants">grants</a>
-        <a href="/specialsection/section/document">document</a>
-        <a href="/specialsection/section/common">common</a>
-        <a href="/specialsection/section/edustandarts">eduStandarts</a>
-        <a href="/specialsection/section/inter">inter</a>
-        <a href="/specialsection/section/budget">budget</a>
-        <a href="/specialsection/section/objects">objects</a>
-        <a href="/specialsection/section/catering">catering</a>
-        <a href="/specialsection/section/education">education</a>
+        <?php foreach ($menuItems as $key => $url): ?>
+            <a href="<?= $url ?>"><?= $key ?></a>
+        <?php endforeach; ?>
     </div>
 </div>
+<?php } else { ?>
+
+    <ul>
+        <li>
+            <?php foreach ($menuItems as $item): ?>
+                <p><a href="<?= $item['url'] ?>" onclick="go(this)"><?= $item['label'] ?></a></p>
+            <?php endforeach; ?>
+        </li>
+    </ul>
+
+<?php } ?>
