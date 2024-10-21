@@ -14,7 +14,7 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
 </head>
 
 <body>
-    <?= MenuSectionsWidget::widget(['userRoles' => $this->params['userRoles'],]) ?>
+    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
     <h1>Организация питания в образовательной деятельности</h1>
     <form method="post" enctype="multipart/form-data">
         <?php

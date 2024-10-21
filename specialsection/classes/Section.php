@@ -6,7 +6,7 @@ class Section {
     public const  GRANTS = 'grants';
     public const  DOCUMENT = 'document';
     public const  COMMON = 'common';
-    public const  EDUSTANDARTS = 'eduStandarts';
+    public const  EDUSTANDARTS = 'edustandarts';
     public const  INTER = 'inter';
     public const  BUDGET = 'budget';
     public const  OBJECTS = 'objects';

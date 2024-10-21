@@ -14,7 +14,7 @@ $this->registerCssFile('@module_specialsection_css/styles.css')
 </head>
 
 <body>
-    <?= MenuSectionsWidget::widget(['userRoles' => $this->params['userRoles'],]) ?>
+    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
     <input type="hidden" id="whatisurl" value=7>
     <h1>Образование</h1>
     <!--Сгенерированные сведения-->

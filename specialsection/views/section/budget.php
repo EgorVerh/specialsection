@@ -16,7 +16,7 @@ $this->registerJsFile('@module_specialsection_js/budget.js');
         $publishedUrl = $assetManager->getPublishedUrl('@app/modules/specialsection/public');
         echo $publishedUrl?>
 <body>
-    <?= MenuSectionsWidget::widget(['userRoles' => $this->params['userRoles'],]) ?>
+    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
     <input type="hidden" id="whatisurl" value=6>
     <h1>Финансово-хозяйственная деятельность</h1>
     <form method="post" enctype="multipart/form-data">

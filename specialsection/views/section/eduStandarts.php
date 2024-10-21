@@ -14,7 +14,7 @@ $this->registerCssFile('@module_specialsection_css/styles.css')
 </head>
 
 <body>
-    <?= MenuSectionsWidget::widget(['userRoles' => $this->params['userRoles'],]) ?>
+    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT, 'items' => $menuItems]) ?>
     <input type="hidden" id="whatisurl" value=3>
     <h1>Образовательные стандарты и требования</h1>
     <!--Сгенерированные сведения-->
@@ -60,7 +60,8 @@ $this->registerCssFile('@module_specialsection_css/styles.css')
                                 <button type="button" id="delrow" class="btn btn-danger delbutton" tabindex="-1"
                                     value='/delete_document'>X</button>
                                 <button type="button" id="hide_button" value='/delete_document' class="hidebutton btn delbutton"
-                                    tabindex="-1" style="background-color: #f5f5f5;"><i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i></button>
+                                    tabindex="-1" style="background-color: #f5f5f5;"><i class="fa fa-eye-slash fa-2x"
+                                        aria-hidden="true"></i></button>
                             </div>
                         </div>
                         <?php $count_row++;
@@ -95,7 +96,8 @@ $this->registerCssFile('@module_specialsection_css/styles.css')
                                                 href="<?php echo $table["data"] ?>">Ссылка на загруженный
                                                 файл</a></div>
                                         <div style="margin-top:20px;"><label class="control-label"
-                                                for="File<?php echo $count_row ?>">Заменить загруженный файл с сохранением ссылки</label>
+                                                for="File<?php echo $count_row ?>">Заменить загруженный файл с сохранением
+                                                ссылки</label>
                                             <?php if (isset($position_wrong) && in_array($table["position"], $position_wrong)) { ?><input
                                                     type="file" id="File<?php echo $count_row ?>"
                                                     class="form-control file-loading wrong_file" name="document[<?php echo $count_row ?>]"
@@ -146,7 +148,8 @@ $this->registerCssFile('@module_specialsection_css/styles.css')
                                                     href="<?php echo $table["data"] ?>">Ссылка на загруженный
                                                     файл</a></div>
                                             <div style="margin-top:20px;"><label class="control-label"
-                                                    for="File<?php echo $count_row ?>">Заменить загруженный файл с сохранением ссылки</label>
+                                                    for="File<?php echo $count_row ?>">Заменить загруженный файл с сохранением
+                                                    ссылки</label>
                                                 <?php if (isset($position_wrong) && in_array($table["position"], $position_wrong)) { ?><input
                                                         type="file" id="File<?php echo $count_row ?>"
                                                         class="form-control file-loading wrong_file"
@@ -162,7 +165,8 @@ $this->registerCssFile('@module_specialsection_css/styles.css')
                                         <button type="button" id="delrow" class="btn btn-danger delbutton" tabindex="-1"
                                             value='/delete_document'>X</button>
                                         <button type="button" id="hide_button" value='/delete_document'
-                                            class="btn delbutton hidebutton" tabindex="-1"><i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i></button>
+                                            class="btn delbutton hidebutton" tabindex="-1"><i class="fa fa-eye-slash fa-2x"
+                                                aria-hidden="true"></i></button>
                                     </div>
                                 </div>
                                 <?php $count_row++;
@@ -200,7 +204,8 @@ $this->registerCssFile('@module_specialsection_css/styles.css')
                                                         href="<?php echo $table["data"] ?>">Ссылка на загруженный
                                                         файл</a></div>
                                                 <div style="margin-top:20px;"><label class="control-label"
-                                                        for="File<?php echo $count_row ?>">Заменить загруженный файл с сохранением ссылки</label>
+                                                        for="File<?php echo $count_row ?>">Заменить загруженный файл с сохранением
+                                                        ссылки</label>
                                                     <?php if (isset($position_wrong) && in_array($table["position"], $position_wrong)) { ?><input
                                                             type="file" id="File<?php echo $count_row ?>"
                                                             class="form-control file-loading wrong_file"
@@ -216,7 +221,8 @@ $this->registerCssFile('@module_specialsection_css/styles.css')
                                             <button type="button" id="delrow" class="btn btn-danger delbutton" tabindex="-1"
                                                 value='/delete_document'>X</button>
                                             <button type="button" id="hide_button" value='/delete_document'
-                                                class="btn delbutton hidebutton" tabindex="-1"><i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i></button>
+                                                class="btn delbutton hidebutton" tabindex="-1"><i class="fa fa-eye-slash fa-2x"
+                                                    aria-hidden="true"></i></button>
                                         </div>
                                     </div>
                                     <?php $count_row++;

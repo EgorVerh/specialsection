@@ -13,7 +13,7 @@ $this->registerJsFile('@module_specialsection_js/inter.js');
 </head>
 
 <body>
-    <?= MenuSectionsWidget::widget(['userRoles' => $this->params['userRoles'],]) ?>
+    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
     <h1>Образовательные стандарты и требования</h1>
     <form method="post">
         <?php $count_row = 0; ?>

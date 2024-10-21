@@ -12,9 +12,11 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
 <head>
     <title>Финансово-хозяйственная деятельность</title>
 </head>
-
+<?php $assetManager = \Yii::$app->assetManager;
+        $publishedUrl = $assetManager->getPublishedUrl('@app/modules/specialsection/public');
+        echo $publishedUrl?>
 <body>
-    <?= MenuSectionsWidget::widget(['userRoles' => $this->params['userRoles'],]) ?>
+    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
     <input type="hidden" id="whatisurl" value=6>
     <h1>Финансово-хозяйственная деятельность</h1>
     <form method="post" enctype="multipart/form-data">
@@ -140,7 +142,7 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
             <input type="hidden" name="budget[0][]" value="0">
             <input type="hidden" name="budget[0][]" value=56>
             <input type="hidden" name="budget[0][]"
-                value=" Информация об обеспечении беспрепятственного доступа в здания образовательной организации">
+                value="Информация об обеспечении беспрепятственного доступа в здания образовательной организации">
             <input type="text" name="budget[0][]">
             <h4>Сведения о средствах обучения и воспитания</h4>
             <input type="hidden" name="budget[1][]" value="0">

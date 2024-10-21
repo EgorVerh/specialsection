@@ -15,7 +15,7 @@ $this->registerJsFile('@module_specialsection_js/document.js');
 </head>
 
 <body>
-    <?= MenuSectionsWidget::widget(['userRoles' => $this->params['userRoles'],]) ?>
+    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
     <input type="hidden" id="whatisurl" value=5>
     <h1 style="margin-bottom:20px;">Стипендии и меры поддержки обучающихся</h1>
     <form method="post" enctype="multipart/form-data">

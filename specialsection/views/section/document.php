@@ -13,7 +13,7 @@ $this->registerCssFile('@module_specialsection_css/styles.css')
     <title>Документы</title>
 </head>
 <body>
-    <?= MenuSectionsWidget::widget(['userRoles' => $this->params['userRoles'],]) ?>
+    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
     <input type="hidden" id="whatisurl" value=1>
     <h1>Документы</h1>
     <!--Сгенерированные сведения-->
