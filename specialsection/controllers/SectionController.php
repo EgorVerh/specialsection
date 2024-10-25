@@ -42,14 +42,33 @@ class SectionController extends Controller
             Section::CATERING => 'catering',
             Section::EDUCATION => 'education',
         ];
-        //var_dump(in_array($action->id, array_keys($access)));
-        //var_dump(array_keys($access));
+
+        //var_dump($sections);
         //die();
-        //var_dump($this->userRoles);
-        //die();
+        /*
+        array(10) { 
+            [0]=> string(7) "paidedu"
+             [1]=> string(6) "grants"
+              [2]=> string(8) "document"
+               [3]=> string(6) "common"
+                [4]=> string(12) "edustandarts"
+                 [5]=> string(5) "inter"
+                  [6]=> string(6) "budget"
+                   [7]=> string(7) "objects"
+                    [8]=> string(8) "catering"
+                     [9]=> string(9) "education" }
+        */
+        $accessIndex = 'index';
+        $accessDelete = [
+            'deletepaidedu',
+            'deletegrants',
+            'deletedocument',
+            'deleteinter',
+            'deletebudget',
+            'deleteobjects'
+        ];
 
         if (in_array($action->id, array_keys($access))) {
-            //$userId = Yii::$app->user->id;
             $user = User::findOne($userId);
 
             $section = $access[$action->id];
@@ -57,43 +76,27 @@ class SectionController extends Controller
             $roleName = 'editor_' . $section;
 
             if ($user->isInRole($roleName)) {
-                $trimmedNamesInRoles = SectionController::getSelfUserRoles($userId);
-                $this->userRoles = $trimmedNamesInRoles;
+                //$trimmedNamesInRoles = SectionController::getSelfUserRoles($userId);
+                //$this->userRoles = $trimmedNamesInRoles;
                 return parent::beforeAction($action);
             } else {
                 throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
             }
-        } else if ($action->id == 'index') {
+        } else if ($action->id == $accessIndex) {
             return parent::beforeAction($action);
+        } else if (in_array($action->id, $accessDelete)) {
+            //    $userId = Yii::$app->user->id;
+            //    $user = User::findOne($userId);
+            //    switch ($action->id){
+            //        case 'deletedocument':
+            //            if ($user->isInRole('editor_')){
+            //
+            //            }
+            //    }
+            return parent::beforeAction($action);
+        } else {
+            throw new \yii\web\NotFoundHttpException("Запрашиваемая страница не найдена.");
         }
-        //else {
-        //    throw new \yii\web\NotFoundHttpException("Запрашиваемая страница не найдена.");
-        //}
-
-
-
-
-        //$this->userRoles = $trimmedNamesInRoles;
-        //var_dump($user->isInRole($roleName));
-        //die();
-        // $editorRoles = array_filter($roles, function($role) {
-        //     return strpos($role['name'], 'editor_') === 0;
-        // });
-
-        // $editorNamesInRoles = array_column($editorRoles, 'name');
-
-        // $trimmedNamesInRoles = array_map(function($name) {
-        //     return substr($name, strlen('editor_'));
-        // }, $editorNamesInRoles);
-
-        // //var_dump($trimmedNamesInRoles)
-        // $this->userRoles = $trimmedNamesInRoles;
-
-        // if (! in_array($action->id, $trimmedNamesInRoles))  {
-        //     throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
-        // }
-
-        return parent::beforeAction($action);
     }
 
     public function init()
@@ -111,9 +114,9 @@ class SectionController extends Controller
      */
     public function actionIndex()
     {
-        
+        //var_dump();
+        //die();
         $filteredMenuItems = self::getFilteredMenuItems();
-
         return $this->render('index', [
             'menuItems' => $filteredMenuItems,
         ]);
@@ -1067,8 +1070,8 @@ class SectionController extends Controller
     }
     public function actionInter()
     {
-        $tabledata = new Dataforms();
         $request = Yii::$app->request;
+        $tabledata = new Dataforms();
         if ($request->post("inter")) {
             foreach ($request->post("inter") as $inter) {
                 if ($inter[0][0] != 0) {
@@ -1137,6 +1140,7 @@ class SectionController extends Controller
             ->andWhere(['fieldsforms.nameform' => 'inter'])
             ->joinWith('extraFields')
             ->all();
+
         $filteredMenuItems = self::getFilteredMenuItems();
         return $this->render('inter', ["data" => $data, 'menuItems' => $filteredMenuItems,]);
     }
@@ -2167,6 +2171,7 @@ class SectionController extends Controller
     //Дальше идут удаления
     public function actionDeletepaidedu()
     {
+        //document
         $request = Yii::$app->request;
         $table = new Dataforms();
         $delintable = $table::find()
@@ -2251,6 +2256,8 @@ class SectionController extends Controller
     }
     public function actionDeletedocument()
     {
+        $userId = Yii::$app->user->id;
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
         $request = Yii::$app->request;
         $table = new Dataforms();
         if ($request->post('document')) {
@@ -2260,8 +2267,9 @@ class SectionController extends Controller
             }
             if ($request->post('whatisurl')) {
                 switch ($request->post('whatisurl')) {
-                    //documetn
+                    //document
                     case "1":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'document'], ['enabled' => 1]])
@@ -2269,14 +2277,16 @@ class SectionController extends Controller
                         break;
                     //common
                     case "2":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['fieldsforms.fieldform' => 'licence_to_carry_out_educational_activities'])
                             ->orWhere(['fieldsforms.fieldform' => 'state_accreditation_of_educational_activities_under_implemented_educational_programmes'])
                             ->andWhere(['enabled' => 1])
                             ->all();
                         break;
-                    //edustandart
+                    //edustandarts
                     case "3":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'edustandarts'], ['enabled' => 1]])
@@ -2284,6 +2294,7 @@ class SectionController extends Controller
                         break;
                     //paid_edu
                     case "4":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'paid_edu'], ['enabled' => 1]])
@@ -2291,6 +2302,7 @@ class SectionController extends Controller
                         break;
                     //grants
                     case "5":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'grants'], ['enabled' => 1], ['>', 'fieldsforms.count_upload_doc', 0]])
@@ -2298,12 +2310,14 @@ class SectionController extends Controller
                         break;
                     //budget
                     case "6":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'budget'], ['enabled' => 1], ['>', 'fieldsforms.count_upload_doc', 0]])
                             ->all();
                         break;
                     //education
                     case "7":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'education'], ['enabled' => 1]])
                             ->all();
@@ -2359,8 +2373,9 @@ class SectionController extends Controller
         } else {
             if ($request->post('whatisurl')) {
                 switch ($request->post('whatisurl')) {
-                    //documetn
+                    //document
                     case "1":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'document'], ['enabled' => 1]])
@@ -2368,13 +2383,15 @@ class SectionController extends Controller
                         break;
                     //common
                     case "2":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['or', ['fieldsforms.fieldform' => 'licence_to_carry_out_educational_activities'], ['fieldsforms.fieldform' => 'state_accreditation_of_educational_activities_under_implemented_educational_programmes']])
                             ->andWhere(['enabled' => 1])
                             ->one();
                         break;
-                    //edustandart
+                    //edustandarts
                     case "3":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'edustandarts'], ['enabled' => 1]])
@@ -2382,6 +2399,7 @@ class SectionController extends Controller
                         break;
                     //paid_edu
                     case "4":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'paid_edu'], ['enabled' => 1]])
@@ -2389,6 +2407,7 @@ class SectionController extends Controller
                         break;
                     //grants
                     case "5":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'grants'], ['>', 'fieldsforms.count_upload_doc', 0], ['enabled' => 1]])
@@ -2396,12 +2415,14 @@ class SectionController extends Controller
                         break;
                     //budget
                     case "6":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'budget'], ['>', 'fieldsforms.count_upload_doc', 0], ['enabled' => 1]])
                             ->one();
                         break;
                     //education
                     case "7":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'education'], ['enabled' => 1]])
                             ->one();
@@ -2409,7 +2430,7 @@ class SectionController extends Controller
                 }
             }
             if (!$request->post('enabled')) {
-                //Если сслыка для файла пустая, удаляем только запись, если нет то и сам файл
+                //Если ссылка для файла пустая, удаляем только запись, если нет то и сам файл
                 if ($table['data'] == '') {
                     $table->delete();
                 } else {
@@ -2442,21 +2463,81 @@ class SectionController extends Controller
     }
     public function actionDeleteinter()
     {
+
+        $userId = Yii::$app->user->id;
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
         $request = Yii::$app->request;
-        if ($request->post("id") && !$request->post("name")) {
-            $dataforms = new Dataforms();
-            $del = $dataforms::findOne($request->post("id"));
-            $del->delete();
-        }
-        if ($request->post("name")) {
-            $extrafields = new ExtraFields();
-            $del = $extrafields::findOne($request->post("id"));
-            $del->delete();
+        switch ($request->post('whatisurl')) {
+            case 6:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
+            case 7:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
+            case 8:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
+            case 9:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
+            case 10:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
         }
     }
     public function actionDeletebudget()
     {
+        //$userId = Yii::$app->user->id;
+        //$trimmedNamesInRoles = self::getSelfUserRoles($userId);
         $request = Yii::$app->request;
+        //self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+
+
         $table = new Dataforms();
         $delintable = $table::find()
             ->joinWith('fieldsforms')
@@ -2498,44 +2579,92 @@ class SectionController extends Controller
     }
     public function actionDeleteobjects()
     {
+        $userId = Yii::$app->user->id;
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
         $request = Yii::$app->request;
-        $table = new Dataforms();
-        $delintable = $table::find()
-            ->joinWith('fieldsforms')
-            ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
-            ->all();
-        if ($request->post('paid_educational')) {
-            $post_paid_educational = [];
-            foreach ($request->post('paid_educational') as $postdata) {
-                $post_paid_educational[] = $postdata[0];
-            }
-            foreach ($delintable as $deldata) {
-                if (in_array($deldata['id'], $post_paid_educational)) {
+
+        switch ($request->post('whatisurl')) {
+
+            case 8:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                $table = new Dataforms();
+                $delintable = $table::find()
+                    ->joinWith('fieldsforms')
+                    ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
+                    ->all();
+                if ($request->post('paid_educational')) {
+                    $post_paid_educational = [];
+                    foreach ($request->post('paid_educational') as $postdata) {
+                        $post_paid_educational[] = $postdata[0];
+                    }
+                    foreach ($delintable as $deldata) {
+                        if (in_array($deldata['id'], $post_paid_educational)) {
+                        } else {
+                            //Если enabled не существует то мы его удаляем, а если существует, скрываем элемент
+                            if (!$request->post('enabled')) {
+                                $del = $table::findOne($deldata['id']);
+                                $del->delete();
+                            } else {
+                                $del = $table::findOne($deldata['id']);
+                                $del->enabled = 0;
+                                $del->updated_at = new \yii\db\Expression('NOW()');
+                                $del->save();
+                            }
+                        }
+                    }
                 } else {
-                    //Если enabled не существует то мы его удаляем, а если существует, скрываем элемент
+                    $table = $table::find()
+                        ->joinWith('fieldsforms')
+                        ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
+                        ->one();
                     if (!$request->post('enabled')) {
-                        $del = $table::findOne($deldata['id']);
-                        $del->delete();
+                        $table->delete();
                     } else {
-                        $del = $table::findOne($deldata['id']);
-                        $del->enabled = 0;
-                        $del->updated_at = new \yii\db\Expression('NOW()');
-                        $del->save();
+                        $table->enabled = 0;
+                        $table->updated_at = new \yii\db\Expression('NOW()');
+                        $table->save();
                     }
                 }
-            }
-        } else {
-            $table = $table::find()
-                ->joinWith('fieldsforms')
-                ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
-                ->one();
-            if (!$request->post('enabled')) {
-                $table->delete();
-            } else {
-                $table->enabled = 0;
-                $table->updated_at = new \yii\db\Expression('NOW()');
-                $table->save();
-            }
+            case 10:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                $table = new Dataforms();
+                $delintable = $table::find()
+                    ->joinWith('fieldsforms')
+                    ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
+                    ->all();
+                if ($request->post('paid_educational')) {
+                    $post_paid_educational = [];
+                    foreach ($request->post('paid_educational') as $postdata) {
+                        $post_paid_educational[] = $postdata[0];
+                    }
+                    foreach ($delintable as $deldata) {
+                        if (in_array($deldata['id'], $post_paid_educational)) {
+                        } else {
+                            //Если enabled не существует то мы его удаляем, а если существует, скрываем элемент
+                            if (!$request->post('enabled')) {
+                                $del = $table::findOne($deldata['id']);
+                                $del->delete();
+                            } else {
+                                $del = $table::findOne($deldata['id']);
+                                $del->enabled = 0;
+                                $del->updated_at = new \yii\db\Expression('NOW()');
+                                $del->save();
+                            }
+                        }
+                    }
+                } else {
+                    $table = $table::find()
+                        ->joinWith('fieldsforms')
+                        ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
+                        ->one();
+                    if (!$request->post('enabled')) {
+                        $table->delete();
+                    } else {
+                        $table->enabled = 0;
+                        $table->updated_at = new \yii\db\Expression('NOW()');
+                        $table->save();
+                    }
+                }
         }
     }
     private function getFilteredMenuItems()
@@ -2607,4 +2736,94 @@ class SectionController extends Controller
         }
         return $trimmedNamesInRoles;
     }
+
+    private function getListControllerActions()
+    {
+        return get_class_methods(self::class);
+    }
+
+    private function checkPageDeleteAccess($whatIsUrlId, $listNamesRoles)
+    {
+        /*
+        $request = Yii::$app->request;
+        $userId = Yii::$app->user->id;
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
+        var_dump($trimmedNamesInRoles);
+        die();
+        self::checkPageDeleteAccess('2',$trimmedNamesInRoles);
+        */
+        /*
+        //document
+                    case "1":
+        //common
+                    case "2":
+        //edustandarts
+                    case "3":
+        //paid_edu
+                    case "4":
+        //grants
+                    case "5":
+        //budget
+                    case "6":
+        //education
+                    case "7":
+        */
+        $access = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $access[] = (string) $i;
+        }
+        if (!in_array($whatIsUrlId, $access)) {
+            throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+        }
+        switch ($whatIsUrlId) {
+            case '1':
+                if (!in_array('document', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "2":
+                if (!in_array('common', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "3":
+                if (!in_array('edustandarts', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "4":
+                if (!in_array('paid_edu', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "5":
+                if (!in_array('grants', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "6":
+                if (!in_array('budget', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "7":
+                if (!in_array('education', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "8":
+                if (!in_array('objects', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+            case "9":
+                if (!in_array('inter', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+            case "10":
+                if (!in_array('catering', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+        }
+    }
+
 }

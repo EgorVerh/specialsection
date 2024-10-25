@@ -165,7 +165,7 @@ $this->registerJsFile('@module_specialsection_js/budget.js');
                                 value="<?php echo $data["id"] ?>">
                             <input type="hidden" name="paid_educational[<?php echo $count_url ?>][]" value=46>
                             <div class="col-sm-11">
-                                <label for="text<?php echo $count_url ?>">Название для ссылки</label>
+                                <label for="text<?php echo $count_url ?>">Комментарий</label>
                                 <input type="text" name="paid_educational[<?php echo $count_url ?>][]" placeholder="Статья"
                                     value="<?php echo $data['titel'] ?>" required><br>
                                 <label for="url<?php echo $count_url ?>">Ссылка</label>

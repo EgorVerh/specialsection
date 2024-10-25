@@ -17,7 +17,7 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
         echo $publishedUrl?>
 <body>
     <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
-    <input type="hidden" id="whatisurl" value=6>
+    <input type="hidden" id="whatisurl" value=8>
     <h1>Финансово-хозяйственная деятельность</h1>
     <form method="post" enctype="multipart/form-data">
         <?php

@@ -15,6 +15,7 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
 
 <body>
     <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
+    <input type="hidden" id="whatisurl" value=10>
     <h1>Организация питания в образовательной деятельности</h1>
     <form method="post" enctype="multipart/form-data">
         <?php

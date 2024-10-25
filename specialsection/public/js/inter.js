@@ -16,12 +16,15 @@ $(document).ready(function () {
                 $(document).find("#count_row").val(k - 1);
                 $(this).closest('.row').remove();
                 var add_data = {
-                    id:$(this).attr("value")
+                    id: $(this).attr("value")
                 };
                 $.ajaxSetup({
                     headers: { 'X-CSRF-Token': $csfr }
                 });
-                var data = $.param(add_data);
+                var addwhatisurl = {
+                    whatisurl: $("#whatisurl").attr("value")
+                };
+                var data = $.param(add_data)+ '&' + $.param(addwhatisurl);
                 $.ajax({
                     url: '/delete_inter',
                     type: 'POST',
@@ -39,13 +42,16 @@ $(document).ready(function () {
                         $csfr = $('#csfr').attr("value");
                         $(this).closest('.row').remove();
                         var add_data = {
-                            id:$(this).attr("value"),
-                            name:$(this).attr("name")
+                            id: $(this).attr("value"),
+                            name: $(this).attr("name")
                         };
                         $.ajaxSetup({
                             headers: { 'X-CSRF-Token': $csfr }
                         });
-                        var data = $.param(add_data);
+                        var addwhatisurl = {
+                            whatisurl: $("#whatisurl").attr("value")
+                        };
+                        var data = $.param(add_data)+ '&' + $.param(addwhatisurl);
                         $.ajax({
                             url: '/delete_inter',
                             type: 'POST',

@@ -12,6 +12,9 @@ $(document).ready(function () {
                 k = Number($("#count_url").attr("value"));
                 $(document).find("#count_url").val(k - 1);
                 $(this).closest('.row').remove();
+                var addwhatisurl = {
+                    whatisurl: $("#whatisurl").attr("value")
+                };
                 var data = $('form').serialize();
                 $.ajax({
                     url: '/delete_objects',
@@ -40,7 +43,11 @@ $(document).ready(function () {
                 var addenabledval = {
                     enabled: 1
                 };
-                var data = $('form').serialize() + '&' + $.param(addenabledval);
+                var addwhatisurl = {
+                    whatisurl: $("#whatisurl").attr("value")
+                };
+                var data = $('form').serialize() + '&' + $.param(addenabledval)+ '&' + $.param(addwhatisurl);
+                //var data = $.param(add_data)+ '&' + $.param(addwhatisurl);
                 $.ajax({
                     url: '/delete_objects',
                     type: 'POST',
@@ -68,7 +75,10 @@ $(document).ready(function () {
                 $.ajaxSetup({
                     headers: { 'X-CSRF-Token': $csfr }
                 });
-                var data = $.param(add_data);
+                var addwhatisurl = {
+                    whatisurl: $("#whatisurl").attr("value")
+                };
+                var data = $.param(add_data)+ '&' + $.param(addwhatisurl);
                 $.ajax({
                     url: '/delete_inter',
                     type: 'POST',

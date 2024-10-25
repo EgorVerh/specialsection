@@ -14,6 +14,7 @@ $this->registerJsFile('@module_specialsection_js/inter.js');
 
 <body>
     <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
+    <input type="hidden" id="whatisurl" value=9>
     <h1>Образовательные стандарты и требования</h1>
     <form method="post">
         <?php $count_row = 0; ?>
