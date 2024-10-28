@@ -1,45 +1,20 @@
 <?php
-
-/** @var yii\web\View $this */
-
 use yii\helpers\Html;
+/** @var yii\web\View $this */
 use frontend\modules\specialsection\assets\AppAsset;
+use frontend\modules\specialsection\widgets\MenuSectionsWidget;
 AppAsset::register($this);
+$this->registerJsFile('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js');
 $this->registerCssFile('@module_specialsection_css/styles.css');
 ?>
-<div class="takedatam">
-    <h2 class="h2_center">Редактирование страницы</h2>
-    <p>ФГБОУ ВО &laquo;ВГСПУ&raquo;</p>
-<!-- Первая форма ввода -->
-<form> 
-<div class="row margin_row">
-<b class="col-md-4 color_col">О полном наименовании образовательной организации</b>
-    <div class="form col-md-8"> 
-    <textarea class="form-control form_control_margin" name="Textarea1"><?php echo Yii::$app->request->get("Textarea1")?></textarea>
-  </div>
-</div>
-<!-- Конец Первая форма ввода -->
+<h1>Сведения об образовательной организации</h1>
+<!--Сгенерированные сведения-->
+<h3>Выберите подраздел</h3>
 
-<!-- Вторая форма ввода -->
-<div class="row margin_row">
-    <b class="col-md-4 color_col">Сокращенное (при наличии) наименование образовательной организации</b>
-    <div class="form col-md-8">
-    <textarea class="form-control form_control_margin" name="Textarea2"><?php echo Yii::$app->request->get("Textarea2")?></textarea>
-  </div>
-</div>
-<!-- Коненц Вторая форма ввода -->
+<?php
 
-<!-- Третья форма ввода -->
-<div class="row margin_row">
-    <b class="col-md-4 color_col">Дата создания образовательной организации</b>
-    <div class="form col-md-8">
-    <textarea class="form-control form_control_margin" name="Textarea3"><?php echo Yii::$app->request->get("Textarea3")?></textarea>
-  </div>
-</div>
-<!-- Конец Третья форма ввода -->
-<div class="form-group form_group_margin">
-<?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
-</div>
-</form>
-</div>
-<!-- Ссылка ввиде имени -->
+echo MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_LIST,'items'=> $menuItems]);
+
+?>
+
+<!--Конец сведений-->

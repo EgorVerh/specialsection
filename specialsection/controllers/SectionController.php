@@ -4,390 +4,123 @@ namespace frontend\modules\specialsection\controllers;
 
 use Yii;
 use yii\helpers\FileHelper;
-use yii\db\Query;
 use yii\web\Controller;
 use yii\validators\UrlValidator;
 use frontend\modules\specialsection\models\Dataforms;
-use frontend\modules\specialsection\models\Form2addres;
-use frontend\modules\specialsection\models\Form2email;
-use frontend\modules\specialsection\models\Savefiles;
-use frontend\modules\specialsection\models\UploadForm;
 use frontend\modules\specialsection\models\Fieldsforms;
 use frontend\modules\specialsection\models\ExtraFields;
-use frontend\modules\specialsection\widgets\MenuSectionsWidget;
-use yii\web\UploadedFile;
-use frontend\models\StorageUploadForm;
-use common\models\storage\Upload;
 use Aws\S3\S3Client;
-use Aws\S3\ObjectUploader;
-use Aws\S3\MultipartUploader;
-use Aws\Exception\MultipartUploadException;
+
+use frontend\modules\specialsection\classes\Section;
+use common\models\user;
 
 /**
  * Default controller for the `newmodules` module
  */
+
+
 class SectionController extends Controller
 {
-    public function init()
-    {
-        parent::init();
-        $this->view->params['MenuSectionsWidget'] = MenuSectionsWidget::widget();
-    }
+
+    protected $userRoles = [];
 
     public function beforeAction($action)
     {
-        // if ($action->id == 'paid_edu') {
-        //     $this->enableCsrfValidation = false;
-        // }
+        $userId = Yii::$app->user->id;
 
-        // $this->enableCsrfValidation = true; 
-        Yii::$app->request->enableCsrfValidation = true;
+        $sections = Section::getSections();
 
-        return parent::beforeAction($action);
+        $access = [
+            Section::PAIDEDU => 'paidedu',
+            Section::GRANTS => 'grants',
+            Section::DOCUMENT => 'document',
+            Section::COMMON => 'common',
+            Section::EDUSTANDARTS => 'edustandarts',
+            Section::INTER => 'inter',
+            Section::BUDGET => 'budget',
+            Section::OBJECTS => 'objects',
+            Section::CATERING => 'catering',
+            Section::EDUCATION => 'education',
+        ];
+
+        //var_dump($sections);
+        //die();
+        /*
+        array(10) { 
+            [0]=> string(7) "paidedu"
+             [1]=> string(6) "grants"
+              [2]=> string(8) "document"
+               [3]=> string(6) "common"
+                [4]=> string(12) "edustandarts"
+                 [5]=> string(5) "inter"
+                  [6]=> string(6) "budget"
+                   [7]=> string(7) "objects"
+                    [8]=> string(8) "catering"
+                     [9]=> string(9) "education" }
+        */
+        $accessIndex = 'index';
+        $accessDelete = [
+            'deletepaidedu',
+            'deletegrants',
+            'deletedocument',
+            'deleteinter',
+            'deletebudget',
+            'deleteobjects'
+        ];
+
+        if (in_array($action->id, array_keys($access))) {
+            $user = User::findOne($userId);
+
+            $section = $access[$action->id];
+
+            $roleName = 'editor_' . $section;
+
+            if ($user->isInRole($roleName)) {
+                //$trimmedNamesInRoles = SectionController::getSelfUserRoles($userId);
+                //$this->userRoles = $trimmedNamesInRoles;
+                return parent::beforeAction($action);
+            } else {
+                throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+            }
+        } else if ($action->id == $accessIndex) {
+            return parent::beforeAction($action);
+        } else if (in_array($action->id, $accessDelete)) {
+            //    $userId = Yii::$app->user->id;
+            //    $user = User::findOne($userId);
+            //    switch ($action->id){
+            //        case 'deletedocument':
+            //            if ($user->isInRole('editor_')){
+            //
+            //            }
+            //    }
+            return parent::beforeAction($action);
+        } else {
+            throw new \yii\web\NotFoundHttpException("Запрашиваемая страница не найдена.");
+        }
+    }
+
+    public function init()
+    {
+        parent::init();
+
+        //$this->on(Controller::EVENT_BEFORE_ACTION, function ($event) {
+        //    $event->sender->view->params['userRoles'] = $this->userRoles;
+        //});
     }
 
     /**
      * Renders the index view for the module
      * @return string
      */
-    public function actionUpload()
-    {
-        $s3 = new S3Client([
-            'version' => 'latest',
-            'region' => 'msk',
-            'use_path_style_endpoint' => true,
-            'credentials' => [
-                'key' => 'minioadmin',
-                'secret' => 'minioadmin',
-            ],
-            'endpoint' => 'http://192.168.9.2:9000',
-        ]);
-        $model = new UploadForm();
-        $presignedUrl = "fdgfdg";
-        if (Yii::$app->request->isPost) {
-            $model->file = UploadedFile::getInstance($model, 'file');
-            if ($model->file && $model->validate()) {
-                $s3->putObject([
-                    'Bucket' => 'testbucket',
-                    // 'Key'    => $model->file->baseName.'.'.$model->file->extension,//'desiredFileName',//'testkey',
-                    'Key' => "xpnI101OqUCeujMzGPDIReDUSs0Tp3KrEnr9w4tUdD4p5Ysl6F." . $model->file->extension,
-                    'Body' => file_get_contents($model->file->tempName),
-                    //['ContentType' => $model->file->extension]),//'Hello from Sanechek',
-                ]);
-
-                $s3->listBuckets();
-
-                // var_dump($amountBuckets);
-
-
-                $command = $s3->getCommand('GetObject', [
-                    'Bucket' => 'testbucket',
-                    'Key' => $model->file->baseName . '.' . $model->file->extension
-                ]);
-
-                $myPresignedRequest = $s3->createPresignedRequest($command, '+10 minutes');
-                $presignedUrl = (string) $myPresignedRequest->getUri(); //получили актуальную ссылку
-
-
-                $insert = $s3->putObject([
-                    'Bucket' => 'testbucket',
-                    'Key' => 'desiredFileName',//'testkey',
-                    'Body' => 'Hello from Sanechek'
-                ]);
-
-                echo $presignedUrl;
-                //$model->file->saveAs('uploads/' . $model->file->baseName . '.' . $model->file->extension);
-            }
-        }
-
-        return $this->render('upload', ['model' => $model, 'urlminio' => $presignedUrl]);
-    }
     public function actionIndex()
     {
-        $request = Yii::$app->request;
-        $saveintable = new Dataforms();
-        $saveintable->titel = 'О полном наименовании образовательной организации';
-        $dataht = $request->get('Textarea1');
-        $saveintable->data = $dataht;
-        $saveintable->save();
-
-        $saveintable = new Dataforms();
-        $saveintable->titel = 'Сокращенное (при наличии) наименование образовательной организации';
-        $dataht = $request->get('Textarea2');
-        $saveintable->data = $dataht;
-        $saveintable->save();
-
-        $saveintable = new Dataforms();
-        $saveintable->titel = 'Дата создания образовательной организации';
-        $dataht = $request->get('Textarea3');
-        $saveintable->data = $dataht;
-        $saveintable->save();
-
-        return $this->render('index');
-    }
-    public function actionForm2()
-    {
-        $dataform = Dataforms::find()->all();
-        $request = Yii::$app->request;
-        if ($request->post('Massrows')) {
-            foreach ($request->post('Massrows') as $number => $row) {
-                $p = 0;
-                foreach ($dataform as $idtable) {
-                    if ($request->post('id')[$number] == $idtable['id']) {
-                        $saveintable = Dataforms::findOne($request->post('id')[$number]);
-                        $saveintable->data = $row[0][0];
-                        $saveintable->save();
-                        $saveintable = Dataforms::findOne($request->post('id')[$number] + 1);
-                        $saveintable->data = $row[0][1];
-                        $saveintable->save();
-                        $saveintable = Dataforms::findOne($request->post('id')[$number] + 2);
-                        $saveintable->data = $row[0][2];
-                        $saveintable->save();
-                        if (isset($row[1])) {
-                            $saveintable = new Form2email();
-                            $emails = $saveintable::findAll(['id' => $request->post('id')[$number]]);
-                            foreach ($row[1] as $num => $row1) {
-                                if (isset($emails[$num]['idform2email'])) {
-                                    $save = $saveintable::findOne(['idform2email' => $emails[$num]['idform2email']]);
-                                    $save->email = $row1;
-                                    $save->save();
-                                } else {
-                                    $saveintable = new Form2email();
-                                    $saveintable->email = $row1;
-                                    $saveintable->id = $request->post('id')[$number];
-                                    $saveintable->save();
-                                }
-
-                            }
-                        }
-                        if (isset($row[2])) {
-                            $saveintable = new Form2addres();
-                            $address = $saveintable::findAll(['id' => $request->post('id')[$number]]);
-                            foreach ($row[2] as $n => $row2) {
-                                if (isset($address[$n]['idform2addres'])) {
-                                    $save = $saveintable::findOne(['idform2addres' => $address[$n]['idform2addres']]);
-                                    $save->addres = $row2;
-                                    $save->save();
-                                } else {
-                                    $saveintable = new Form2addres();
-                                    $saveintable->addres = $row2;
-                                    $saveintable->id = $request->post('id')[$number];
-                                    $saveintable->save();
-                                }
-
-                            }
-                        }
-                        $p = 1;
-                    }
-                }
-                if ($p == 0) {
-                    //Сохранение всех textarea  в строке
-                    $saveintable = new Dataforms();
-                    $saveintable->titel = 'Наименование учредителя образовательной организации';
-                    $saveintable->data = $row[0][0];
-                    $saveintable->save();
-                    $idfordop = Yii::$app->db->getLastInsertID();
-
-                    $saveintable = new Dataforms();
-                    $saveintable->titel = 'Юридический адрес учредителя';
-                    $saveintable->data = $row[0][1];
-                    $saveintable->save();
-
-                    $saveintable = new Dataforms();
-                    $saveintable->titel = 'Контактный телефон учредителя';
-                    $saveintable->data = $row[0][2];
-                    $saveintable->save();
-                    //Конец сохранения всех textarea  в строке
-
-                    //Сохранение адресов и сайтов
-                    if (isset($row[1])) {
-                        foreach ($row[1] as $row1) {
-                            $saveintable = new Form2email();
-                            $saveintable->id = $idfordop;
-                            $saveintable->email = $row1;
-                            $saveintable->save();
-                        }
-                    }
-                    if (isset($row[2])) {
-                        foreach ($row[2] as $row2) {
-                            $saveintable = new Form2addres();
-                            $saveintable->id = $idfordop;
-                            $saveintable->addres = $row2;
-                            $saveintable->save();
-                        }
-                    }
-                }
-
-            }
-            //Конец сохранения адресов и сайтов
-            return $this->redirect('form2');
-        }
-        $dataform = Dataforms::find()->one();
-        $addres = Form2addres::find()->all();
-        $email = Form2email::find()->all();
-        $query = new Query();
-        $query1 = $query->select(['id', 'data',])->from('dataforms')->where(['titel' => 'Наименование учредителя образовательной организации'])->all();
-        $query2 = $query->select(['id', 'data',])->from('dataforms')->where(['titel' => 'Юридический адрес учредителя'])->all();
-        $query3 = $query->select(['id', 'data',])->from('dataforms')->where(['titel' => 'Контактный телефон учредителя'])->all();
-        return $this->render('form2', ['query1' => $query1, 'query2' => $query2, 'query3' => $query3, 'dataform' => $dataform, 'tableaddres' => $addres, 'tableemail' => $email]);
-    }
-
-    public function actionForm3()
-    {
-        $request = Yii::$app->request;
-        $savefilestable = Savefiles::find()->all();
-        $key = $this->module->params['key'];
-        $secret = $this->module->params['secret'];
-        $endpoint = $this->module->params['endpoint'];
-        $bucket = $this->module->params['Bucket'];
-        if (isset($_FILES['upload_file'])) {
-            $savefilestable = Savefiles::find()->all();
-            foreach ($_FILES['upload_file']['name'] as $file => $name) {
-                $p = 0;
-                if ($name != '') {
-                    foreach ($savefilestable as $data) {
-                        if ($_POST['upload_file'][$file] == $data['position']) {
-                            $s3 = new S3Client([
-                                'version' => 'latest',
-                                'region' => 'msk',
-                                'use_path_style_endpoint' => true,
-                                'credentials' => [
-                                    'key' => $key,
-                                    'secret' => $secret,
-                                ],
-                                'endpoint' => $endpoint,
-                            ]);
-                            $position = $data['Position'];
-                            $testMimeType = FileHelper::getMimeTypeByExtension($name);
-                            $s3->putObject([
-                                'Bucket' => $bucket,
-                                'Key' => $position,
-                                'Body' => file_get_contents($_FILES['upload_file']['tmp_name'][$file]),
-                                'ContentDisposition' => '"inline"',
-                                'ContentType' => $testMimeType
-                            ]);
-                            $s3->listBuckets();
-                            $command = $s3->getCommand('GetObject', [
-                                'Bucket' => $bucket,
-                                'Key' => $position
-                            ]);
-                            $myPresignedRequest = $s3->createPresignedRequest($command, '+1000 minutes');
-                            $presignedUrl = (string) $myPresignedRequest->getUri(); //получили актуальную ссылку
-                            $lastdotposition = strpos($presignedUrl, "?");
-                            if ($lastdotposition !== false) {
-                                $link = substr($presignedUrl, 0, $lastdotposition);
-                            }
-                            $saveintable = Savefiles::findOne($data["id"]);
-                            $saveintable->titel = $_POST['Textarea'][$file];
-                            $saveintable->fieldsforms_id = $_POST['Textarea'][$file];
-                            $saveintable->link = $link;
-                            $saveintable->save();
-                            $p = 1;
-                            break;
-                        }
-                    }
-                    if ($p == 0) {
-                        $s3 = new S3Client([
-                            'version' => 'latest',
-                            'region' => 'msk',
-                            'use_path_style_endpoint' => true,
-                            'credentials' => [
-                                'key' => $key,
-                                'secret' => $secret,
-                            ],
-                            'endpoint' => $endpoint,
-                        ]);
-                        $randomString = Yii::$app->getSecurity()->generateRandomString();
-                        $position = trim($randomString, "_-");
-                        $testMimeType = FileHelper::getMimeTypeByExtension($name);
-                        $s3->putObject([
-                            'Bucket' => $bucket,
-                            'Key' => $position,
-                            'Body' => file_get_contents($_FILES['upload_file']['tmp_name'][$file]),
-                            'ContentDisposition' => '"inline"',
-                            'ContentType' => $testMimeType
-                        ]);
-                        $s3->listBuckets();
-                        $command = $s3->getCommand('GetObject', [
-                            'Bucket' => $bucket,
-                            'Key' => $position
-                        ]);
-                        $myPresignedRequest = $s3->createPresignedRequest($command, '+1000 minutes');
-                        $presignedUrl = (string) $myPresignedRequest->getUri(); //получили актуальную ссылку
-                        $lastdotposition = strpos($presignedUrl, "?");
-                        if ($lastdotposition !== false) {
-                            $link = substr($presignedUrl, 0, $lastdotposition);
-                        }
-                        $saveintable = new Savefiles();
-                        $saveintable->titel = $_POST['Textarea'][$file];
-                        $saveintable->fieldsforms_id = $request->post('Textarea')[$file];
-                        $saveintable->link = $link;
-                        $saveintable->position = $position;
-                        $saveintable->save();
-                    }
-                } else {
-                    foreach ($savefilestable as $data) {
-                        if ($_POST['upload_file'][$file] == $data['position']) {
-                            $saveintable = Savefiles::findOne($data["id"]);
-                            $saveintable->titel = $_POST['Textarea'][$file];
-                            $saveintable->save();
-                            $p = 1;
-                            break;
-                        }
-                    }
-                    if ($p == 0) {
-                        $randomString = Yii::$app->getSecurity()->generateRandomString();
-                        $position = trim($randomString, "_-");
-                        $saveintable = new Savefiles();
-                        $saveintable->titel = $_POST['Textarea'][$file];
-                        $saveintable->position = $position;
-                        $saveintable->save();
-                    }
-                }
-            }
-            $savefilestable = Savefiles::find()->all();
-            return $this->redirect('form3');
-        }
-        return $this->render('form3', ['tabledata' => $savefilestable]);
-    }
-    public function actionForm4()
-    {
-        $request = Yii::$app->request;
-        $dataforms = new Dataforms();
-        $data = $dataforms::find()->select(['id'])->where(['titel' => 'Название для ссылки'])->all();
-        if ($request->post('Fieldsurl')) {
-            foreach ($request->post('Fieldsurl') as $number => $fild) {
-                $p = 0;
-                foreach ($data as $id) {
-                    if ($request->post('id')[$number] == $id['id']) {
-                        $dataforms = new Dataforms();
-                        $save = $dataforms::findOne($request->post('id')[$number]);
-                        $save->data = $fild[0];
-                        $save->save();
-                        $dataforms = new Dataforms();
-                        $save = $dataforms::findOne($request->post('id')[$number] + 1);
-                        $save->data = $fild[1];
-                        $save->save();
-                        $p = 1;
-                    }
-                }
-                if ($p == 0) {
-                    $dataforms = new Dataforms();
-                    $dataforms->titel = 'Название для ссылки';
-                    $dataforms->data = $fild[0];
-                    $dataforms->save();
-                    $dataforms = new Dataforms();
-                    $dataforms->titel = 'Ссылка';
-                    $dataforms->data = $fild[1];
-                    $dataforms->save();
-                }
-            }
-            return $this->redirect('form4');
-        }
-        $dataforms = new Dataforms();
-        $nameurl = $dataforms::find()->where(['titel' => 'Название для ссылки'])->all();
-        $url = $dataforms::find()->where(['titel' => 'Ссылка'])->all();
-        return $this->render('form4', ['nameurl' => $nameurl, 'url' => $url]);
+        //var_dump();
+        //die();
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render('index', [
+            'menuItems' => $filteredMenuItems,
+        ]);
+        //return $this->render('index',[]);
     }
     public function actionPaidedu()
     {
@@ -576,95 +309,8 @@ class SectionController extends Controller
             }
             return $this->redirect('');
         }
-        return $this->render('paid_edu', ['tabledata' => $data]);
-    }
-    public function actionGrantsold()
-    {
-        $request = Yii::$app->request;
-        if ($request->post('paid_educational')) {
-            foreach ($request->post('paid_educational') as $row) {
-                $p = 0;
-                if (!empty($row[3]) && ((new UrlValidator())->validate($row[3]))) {
-                    if ($row[0] != '0') {
-                        $saveintable = Dataforms::findOne($row[0]);
-                        if (!empty($saveintable) && ($row[3] != $saveintable['data'] || $row[2] != $saveintable['titel'])) {
-                            $saveintable->titel = $row[2];
-                            $saveintable->data = $row[3];
-                            $saveintable->updated_at = new \yii\db\Expression('NOW()');
-                            if ($saveintable->validate()) {
-                                $saveintable->save();
-                            } else {
-                                $p = 1;
-                            }
-                        }
-                    } else {
-                        $saveintable = new Dataforms();
-                        $saveintable->fieldsforms_id = $row[1];
-                        $saveintable->titel = $row[2];
-                        $saveintable->data = $row[3];
-                        if ($saveintable->validate()) {
-                            $saveintable->save();
-                        } else {
-                            $p = 1;
-                        }
-                    }
-                } else {
-                    $p = 1;
-                }
-                if ($p == 1) {
-                    //Заполняем пустую link следующим текстом
-                    if (empty($row[3])) {
-                        $row[3] = "Введите данные";
-                    }
-                    // Проверка на то какая это запись, новая или старая
-                    if ($row[0] == 0) {
-                        $wrong[] = [
-                            "titel" => $row[2],
-                            "id" => 0,
-                            "data" => $row[3],
-                            "fieldsforms_id" => $row[1]
-                        ];
-                    } else {
-                        $wrong[] = [
-                            "titel" => $row[2],
-                            "id" => $row[0],
-                            "data" => $row[3],
-                            "fieldsforms_id" => $row[1]
-                        ];
-                    }
-                    // Создание переменной в сесси wrong_data, которая будет содержать ошибки допущенные пользователем
-                    Yii::$app->session->set('wrong_data', $wrong);
-                    Yii::$app->session->setFlash('error', 'Проверьте правильность введенных данных.');
-                }
-            }
-            return $this->redirect('grants');
-        }
-        $takedata = new Dataforms();
-        $data = $takedata::find()
-            ->joinWith('fieldsforms')
-            ->andWhere(['fieldsforms.nameform' => 'grants'])
-            ->all();
-        // Проверка на то  есть ли переменная wrong_data
-        if (Yii::$app->session->has('wrong_data')) {
-            $wrong_data = Yii::$app->session->get('wrong_data');
-            //Если переменная wrong_data есть, сравнимаем полученные данные из таблицы 
-            //и либо заменяем их, либо добавляем новые в массив data
-            foreach ($wrong_data as $wr) {
-                if ($wr["id"] != 0) {
-                    foreach ($data as $tabledata) {
-                        if ($wr["id"] == $tabledata["id"]) {
-                            $tabledata["titel"] = $wr["titel"];
-                            $tabledata["data"] = $wr["data"];
-                            break;
-                        }
-                    }
-                } else {
-                    $data[] = $wr;
-                }
-            }
-            Yii::$app->session->remove('wrong_data');
-        }
-        return $this->render('grantsold', ['tabledata' => $data,]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render('paid_edu', ['tabledata' => $data, 'menuItems' => $filteredMenuItems]);
     }
     public function actionDocument()
     {
@@ -874,7 +520,8 @@ class SectionController extends Controller
             }
             Yii::$app->session->remove('wrong_data');
         }
-        return $this->render('document', ['tabledata' => $savefilestable, 'position_wrong' => $position_wrong]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render('document', ['tabledata' => $savefilestable, 'position_wrong' => $position_wrong, 'menuItems' => $filteredMenuItems]);
     }
     public function actionCommon()
     {
@@ -884,8 +531,9 @@ class SectionController extends Controller
             ->andWhere(['and', ['fieldsforms.nameform' => 'common'], ['position' => Null]])
             ->joinWith('extraFields')
             ->all();
-        $datadoc = $takedata::find()->joinWith('fieldsforms')
-            ->andWhere(['or', ['fieldsforms.fieldform' => 'licence_to_carry_out_educational_activities'], ['fieldsforms.fieldform' => 'state_accreditation_of_educational_activities_under_implemented_educational_programmes']])
+        $datadoc = $takedata::find()
+            ->joinWith('fieldsforms')
+            ->andWhere(['and', ['fieldsforms.nameform' => 'common']])->andWhere(['not', ['position' => null]])
             ->all();
         $request = Yii::$app->request;
         if ($request->post()) {
@@ -1216,10 +864,22 @@ class SectionController extends Controller
             }
             return $this->redirect('common');
         }
-        return $this->render('common', ['datarows' => $datarows, 'tabledata' => $datadoc]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render('common', ['datarows' => $datarows, 'tabledata' => $datadoc, 'menuItems' => $filteredMenuItems]);
     }
     public function actionEdustandarts()
     {
+        #var_dump('test');
+        #die();
+        // $takedata = new Dataforms();
+        // $data = $takedata::find()
+        //     ->joinWith('extraFields')
+        //     ->joinWith('fieldsforms')
+        //     ->all();
+        // echo "<pre>";
+        // var_dump($data);
+        // echo "</pre>";
+        // die();
         $takedata = new Dataforms();
         $data = $takedata::find()
             ->joinWith('fieldsforms')
@@ -1405,12 +1065,13 @@ class SectionController extends Controller
             }
             return $this->redirect('');
         }
-        return $this->render('eduStandarts', ['tabledata' => $data]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render('eduStandarts', ['tabledata' => $data, 'menuItems' => $filteredMenuItems,]);
     }
     public function actionInter()
     {
-        $tabledata = new Dataforms();
         $request = Yii::$app->request;
+        $tabledata = new Dataforms();
         if ($request->post("inter")) {
             foreach ($request->post("inter") as $inter) {
                 if ($inter[0][0] != 0) {
@@ -1479,7 +1140,9 @@ class SectionController extends Controller
             ->andWhere(['fieldsforms.nameform' => 'inter'])
             ->joinWith('extraFields')
             ->all();
-        return $this->render('inter', ["data" => $data]);
+
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render('inter', ["data" => $data, 'menuItems' => $filteredMenuItems,]);
     }
     public function actionGrants()
     {
@@ -1712,7 +1375,8 @@ class SectionController extends Controller
             }
             Yii::$app->session->remove('wrong_data');
         }
-        return $this->render("grants", ['tabledata' => $savefilestable, 'singledata' => $singledata]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render("grants", ['tabledata' => $savefilestable, 'singledata' => $singledata, 'menuItems' => $filteredMenuItems,]);
     }
     public function actionBudget()
     {
@@ -2053,7 +1717,8 @@ class SectionController extends Controller
             ->joinWith('fieldsforms')
             ->andWhere(['and', ['fieldsforms.nameform' => 'budget'], ['>', 'fieldsforms.count_upload_doc', 0]])
             ->all();
-        return $this->render("budget", ["tabledata" => $tabledata, "singledata" => $singledata, "report" => $report]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render("budget", ["tabledata" => $tabledata, "singledata" => $singledata, "report" => $report, 'menuItems' => $filteredMenuItems,]);
     }
     public function actionObjects()
     {
@@ -2198,7 +1863,8 @@ class SectionController extends Controller
             ->joinWith('fieldsforms')
             ->andWhere(['and', ['fieldsforms.nameform' => 'objects'], ['not in', 'fieldsforms.id', [49, 50, 51, 52, 53, 54, 55]]])
             ->all();
-        return $this->render("objects", ["singledata" => $singledata, "tables" => $tables]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render("objects", ["singledata" => $singledata, "tables" => $tables, 'menuItems' => $filteredMenuItems,]);
     }
     public function actionCatering()
     {
@@ -2247,7 +1913,7 @@ class SectionController extends Controller
                         }
                         $saveintable->fieldsforms_id = $obj[0][$i];
                         $saveintable->data = $obj[0][$i + 1];
-                        $saveintable->type = $type;
+                        $saveintable->type = $type;#!
                         $saveintable->save();
                     }
                 }
@@ -2259,7 +1925,8 @@ class SectionController extends Controller
             ->andWhere(['and', ['fieldsforms.nameform' => 'catering']])
             ->joinWith('extraFields')
             ->all();
-        return $this->render("catering", ["tables" => $tables]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render("catering", ["tables" => $tables, 'menuItems' => $filteredMenuItems,]);
     }
     public function actionEducation()
     {
@@ -2497,53 +2164,14 @@ class SectionController extends Controller
             ->andWhere(['between', 'fieldsforms.id', 75, 80])
             ->joinWith('extraFields')
             ->all();
-        return $this->render("education", ['tabledata' => $data,'tables'=>$tables]);
+        $filteredMenuItems = self::getFilteredMenuItems();
+        return $this->render("education", ['tabledata' => $data, 'tables' => $tables, 'menuItems' => $filteredMenuItems,]);
     }
 
     //Дальше идут удаления
-    public function actionDeleteform2($post, $what_to_delete)
-    {
-        if ($what_to_delete == 'row') {
-            $delintable = new Dataforms();
-            $deldata = $delintable::findOne(['id' => $post]);
-            $deldata->delete();
-            $delintable = new Dataforms();
-            $deldata = $delintable::findOne(['id' => $post + 1]);
-            $deldata->delete();
-            $delintable = new Dataforms();
-            $deldata = $delintable::findOne(['id' => $post + 2]);
-            $deldata->delete();
-        }
-        if ($what_to_delete == 'email') {
-            $delintale = new Form2email;
-            $deldata = $delintale::findOne(['idform2email' => $post]);
-            $deldata->delete();
-        }
-        if ($what_to_delete == 'address') {
-            $delintale = new Form2addres();
-            $deldata = $delintale::findOne(['idform2addres' => $post]);
-            $deldata->delete();
-        }
-        return $this->redirect('form2');
-    }
-    public function actionDeleteform3($post)
-    {
-        $saveintable = new Savefiles();
-        $deldata = $saveintable::findOne(['Position' => $post]);
-        $deldata->delete();
-        return $this->redirect('form3');
-    }
-    public function actionDeleteform4($post)
-    {
-        $saveintable = new Dataforms();
-        $deldata = $saveintable::findOne(['id' => $post]);
-        $deldata->delete();
-        $deldata = $saveintable::findOne(['id' => $post + 1]);
-        $deldata->delete();
-        return $this->redirect('form4');
-    }
     public function actionDeletepaidedu()
     {
+        //document
         $request = Yii::$app->request;
         $table = new Dataforms();
         $delintable = $table::find()
@@ -2628,6 +2256,8 @@ class SectionController extends Controller
     }
     public function actionDeletedocument()
     {
+        $userId = Yii::$app->user->id;
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
         $request = Yii::$app->request;
         $table = new Dataforms();
         if ($request->post('document')) {
@@ -2637,8 +2267,9 @@ class SectionController extends Controller
             }
             if ($request->post('whatisurl')) {
                 switch ($request->post('whatisurl')) {
-                    //documetn
+                    //document
                     case "1":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'document'], ['enabled' => 1]])
@@ -2646,14 +2277,16 @@ class SectionController extends Controller
                         break;
                     //common
                     case "2":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['fieldsforms.fieldform' => 'licence_to_carry_out_educational_activities'])
                             ->orWhere(['fieldsforms.fieldform' => 'state_accreditation_of_educational_activities_under_implemented_educational_programmes'])
                             ->andWhere(['enabled' => 1])
                             ->all();
                         break;
-                    //edustandart
+                    //edustandarts
                     case "3":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'edustandarts'], ['enabled' => 1]])
@@ -2661,6 +2294,7 @@ class SectionController extends Controller
                         break;
                     //paid_edu
                     case "4":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'paid_edu'], ['enabled' => 1]])
@@ -2668,6 +2302,7 @@ class SectionController extends Controller
                         break;
                     //grants
                     case "5":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'grants'], ['enabled' => 1], ['>', 'fieldsforms.count_upload_doc', 0]])
@@ -2675,12 +2310,14 @@ class SectionController extends Controller
                         break;
                     //budget
                     case "6":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'budget'], ['enabled' => 1], ['>', 'fieldsforms.count_upload_doc', 0]])
                             ->all();
                         break;
                     //education
                     case "7":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $delintable = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'education'], ['enabled' => 1]])
                             ->all();
@@ -2736,8 +2373,9 @@ class SectionController extends Controller
         } else {
             if ($request->post('whatisurl')) {
                 switch ($request->post('whatisurl')) {
-                    //documetn
+                    //document
                     case "1":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'document'], ['enabled' => 1]])
@@ -2745,13 +2383,15 @@ class SectionController extends Controller
                         break;
                     //common
                     case "2":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['or', ['fieldsforms.fieldform' => 'licence_to_carry_out_educational_activities'], ['fieldsforms.fieldform' => 'state_accreditation_of_educational_activities_under_implemented_educational_programmes']])
                             ->andWhere(['enabled' => 1])
                             ->one();
                         break;
-                    //edustandart
+                    //edustandarts
                     case "3":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'edustandarts'], ['enabled' => 1]])
@@ -2759,6 +2399,7 @@ class SectionController extends Controller
                         break;
                     //paid_edu
                     case "4":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'paid_edu'], ['enabled' => 1]])
@@ -2766,6 +2407,7 @@ class SectionController extends Controller
                         break;
                     //grants
                     case "5":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'grants'], ['>', 'fieldsforms.count_upload_doc', 0], ['enabled' => 1]])
@@ -2773,12 +2415,14 @@ class SectionController extends Controller
                         break;
                     //budget
                     case "6":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'budget'], ['>', 'fieldsforms.count_upload_doc', 0], ['enabled' => 1]])
                             ->one();
                         break;
                     //education
                     case "7":
+                        self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                         $table = $table::find()->joinWith('fieldsforms')
                             ->andWhere(['and', ['fieldsforms.nameform' => 'education'], ['enabled' => 1]])
                             ->one();
@@ -2786,7 +2430,7 @@ class SectionController extends Controller
                 }
             }
             if (!$request->post('enabled')) {
-                //Если сслыка для файла пустая, удаляем только запись, если нет то и сам файл
+                //Если ссылка для файла пустая, удаляем только запись, если нет то и сам файл
                 if ($table['data'] == '') {
                     $table->delete();
                 } else {
@@ -2819,21 +2463,81 @@ class SectionController extends Controller
     }
     public function actionDeleteinter()
     {
+
+        $userId = Yii::$app->user->id;
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
         $request = Yii::$app->request;
-        if ($request->post("id") && !$request->post("name")) {
-            $dataforms = new Dataforms();
-            $del = $dataforms::findOne($request->post("id"));
-            $del->delete();
-        }
-        if ($request->post("name")) {
-            $extrafields = new ExtraFields();
-            $del = $extrafields::findOne($request->post("id"));
-            $del->delete();
+        switch ($request->post('whatisurl')) {
+            case 6:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
+            case 7:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
+            case 8:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
+            case 9:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
+            case 10:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                if ($request->post("id") && !$request->post("name")) {
+                    $dataforms = new Dataforms();
+                    $del = $dataforms::findOne($request->post("id"));
+                    $del->delete();
+                }
+                if ($request->post("name")) {
+                    $extrafields = new ExtraFields();
+                    $del = $extrafields::findOne($request->post("id"));
+                    $del->delete();
+                }
         }
     }
     public function actionDeletebudget()
     {
+        //$userId = Yii::$app->user->id;
+        //$trimmedNamesInRoles = self::getSelfUserRoles($userId);
         $request = Yii::$app->request;
+        //self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+
+
         $table = new Dataforms();
         $delintable = $table::find()
             ->joinWith('fieldsforms')
@@ -2875,56 +2579,251 @@ class SectionController extends Controller
     }
     public function actionDeleteobjects()
     {
+        $userId = Yii::$app->user->id;
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
         $request = Yii::$app->request;
-        $table = new Dataforms();
-        $delintable = $table::find()
-            ->joinWith('fieldsforms')
-            ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
-            ->all();
-        if ($request->post('paid_educational')) {
-            $post_paid_educational = [];
-            foreach ($request->post('paid_educational') as $postdata) {
-                $post_paid_educational[] = $postdata[0];
-            }
-            foreach ($delintable as $deldata) {
-                if (in_array($deldata['id'], $post_paid_educational)) {
+
+        switch ($request->post('whatisurl')) {
+
+            case 8:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                $table = new Dataforms();
+                $delintable = $table::find()
+                    ->joinWith('fieldsforms')
+                    ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
+                    ->all();
+                if ($request->post('paid_educational')) {
+                    $post_paid_educational = [];
+                    foreach ($request->post('paid_educational') as $postdata) {
+                        $post_paid_educational[] = $postdata[0];
+                    }
+                    foreach ($delintable as $deldata) {
+                        if (in_array($deldata['id'], $post_paid_educational)) {
+                        } else {
+                            //Если enabled не существует то мы его удаляем, а если существует, скрываем элемент
+                            if (!$request->post('enabled')) {
+                                $del = $table::findOne($deldata['id']);
+                                $del->delete();
+                            } else {
+                                $del = $table::findOne($deldata['id']);
+                                $del->enabled = 0;
+                                $del->updated_at = new \yii\db\Expression('NOW()');
+                                $del->save();
+                            }
+                        }
+                    }
                 } else {
-                    //Если enabled не существует то мы его удаляем, а если существует, скрываем элемент
+                    $table = $table::find()
+                        ->joinWith('fieldsforms')
+                        ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
+                        ->one();
                     if (!$request->post('enabled')) {
-                        $del = $table::findOne($deldata['id']);
-                        $del->delete();
+                        $table->delete();
                     } else {
-                        $del = $table::findOne($deldata['id']);
-                        $del->enabled = 0;
-                        $del->updated_at = new \yii\db\Expression('NOW()');
-                        $del->save();
+                        $table->enabled = 0;
+                        $table->updated_at = new \yii\db\Expression('NOW()');
+                        $table->save();
                     }
                 }
-            }
-        } else {
-            $table = $table::find()
-                ->joinWith('fieldsforms')
-                ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
-                ->one();
-            if (!$request->post('enabled')) {
-                $table->delete();
-            } else {
-                $table->enabled = 0;
-                $table->updated_at = new \yii\db\Expression('NOW()');
-                $table->save();
-            }
+            case 10:
+                self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
+                $table = new Dataforms();
+                $delintable = $table::find()
+                    ->joinWith('fieldsforms')
+                    ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
+                    ->all();
+                if ($request->post('paid_educational')) {
+                    $post_paid_educational = [];
+                    foreach ($request->post('paid_educational') as $postdata) {
+                        $post_paid_educational[] = $postdata[0];
+                    }
+                    foreach ($delintable as $deldata) {
+                        if (in_array($deldata['id'], $post_paid_educational)) {
+                        } else {
+                            //Если enabled не существует то мы его удаляем, а если существует, скрываем элемент
+                            if (!$request->post('enabled')) {
+                                $del = $table::findOne($deldata['id']);
+                                $del->delete();
+                            } else {
+                                $del = $table::findOne($deldata['id']);
+                                $del->enabled = 0;
+                                $del->updated_at = new \yii\db\Expression('NOW()');
+                                $del->save();
+                            }
+                        }
+                    }
+                } else {
+                    $table = $table::find()
+                        ->joinWith('fieldsforms')
+                        ->andWhere(['and', ['enabled' => 1], ['or', ['fieldsforms.id' => 65], ['fieldsforms.id' => 66]]])
+                        ->one();
+                    if (!$request->post('enabled')) {
+                        $table->delete();
+                    } else {
+                        $table->enabled = 0;
+                        $table->updated_at = new \yii\db\Expression('NOW()');
+                        $table->save();
+                    }
+                }
         }
     }
+    private function getFilteredMenuItems()
+    {
+
+        $userId = Yii::$app->user->id;
+
+        $baseSectionUrl = '/specialsection/section/';
+        $menuItems = [];
+        $sections = Section::getSections();
+
+        $sectionLabels = [
+            'common' => 'Основные сведения',
+            'struct' => 'Структура и органы управления образовательной организацией',
+            'document' => 'Документы',
+            'education' => 'Образование',
+            'edustandarts' => 'Образовательные стандарты и требования',
+            'managers' => 'Руководство',
+            'employees' => 'Педагогический (научно-педагогический) состав',
+            'objects' => 'Материально-техническое обеспечение и оснащенность образовательного процесса. Доступная среда',
+            'grants' => 'Стипендии и меры поддержки обучающихся',
+            'paidedu' => 'Платные образовательные услуги',
+            'budget' => 'Финансово-хозяйственная деятельность',
+            'vacant' => 'Вакантные места для приема (перевода) обучающихся',
+            'ovz' => 'Доступная среда',
+            'inter' => 'Международное сотрудничество',
+            'catering' => 'Организация питания в образовательной организации',
+        ];
+
+        foreach ($sections as $section) {
+            $url = $baseSectionUrl . $section;
+            $menuItems[$section] = [
+                'url' => $url,
+                'label' => $sectionLabels[$section],
+            ];
+        }
+
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
+
+        $filteredMenuItems = [];
+        foreach ($menuItems as $key => $item) {
+            if (in_array($key, $trimmedNamesInRoles)) {
+                $filteredMenuItems[$key] = $item;
+            }
+        }
+
+        return $filteredMenuItems;
+    }
+    private function getSelfUserRoles($userId)
+    {
+        $access = [
+            Section::PAIDEDU => 'paidedu',
+            Section::GRANTS => 'grants',
+            Section::DOCUMENT => 'document',
+            Section::COMMON => 'common',
+            Section::EDUSTANDARTS => 'eduStandarts',
+            Section::INTER => 'inter',
+            Section::BUDGET => 'budget',
+            Section::OBJECTS => 'objects',
+            Section::CATERING => 'catering',
+            Section::EDUCATION => 'education',
+        ];
+        $user = User::findOne($userId);
+        $trimmedNamesInRoles = [];
+        foreach ($access as $key => $role) {
+            if ($user->isInRole('editor_' . $role)) {
+                array_push($trimmedNamesInRoles, ($access[$key]));
+            }
+        }
+        return $trimmedNamesInRoles;
+    }
+
+    private function getListControllerActions()
+    {
+        return get_class_methods(self::class);
+    }
+
+    private function checkPageDeleteAccess($whatIsUrlId, $listNamesRoles)
+    {
+        /*
+        $request = Yii::$app->request;
+        $userId = Yii::$app->user->id;
+        $trimmedNamesInRoles = self::getSelfUserRoles($userId);
+        var_dump($trimmedNamesInRoles);
+        die();
+        self::checkPageDeleteAccess('2',$trimmedNamesInRoles);
+        */
+        /*
+        //document
+                    case "1":
+        //common
+                    case "2":
+        //edustandarts
+                    case "3":
+        //paid_edu
+                    case "4":
+        //grants
+                    case "5":
+        //budget
+                    case "6":
+        //education
+                    case "7":
+        */
+        $access = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $access[] = (string) $i;
+        }
+        if (!in_array($whatIsUrlId, $access)) {
+            throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+        }
+        switch ($whatIsUrlId) {
+            case '1':
+                if (!in_array('document', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "2":
+                if (!in_array('common', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "3":
+                if (!in_array('edustandarts', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "4":
+                if (!in_array('paid_edu', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "5":
+                if (!in_array('grants', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "6":
+                if (!in_array('budget', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "7":
+                if (!in_array('education', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+                continue;
+            case "8":
+                if (!in_array('objects', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+            case "9":
+                if (!in_array('inter', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+            case "10":
+                if (!in_array('catering', $listNamesRoles)) {
+                    throw new \yii\web\ForbiddenHttpException('У вас нет доступа к этой странице.');
+                }
+        }
+    }
+
 }
-
-
-// $saveuploadfile=$uploadfile;
-// $uploadfile = $uploaddir . basename("Устав.pdf");
-// if(file_exists("/home/vagrant/test/portal_local_repo/app/frontend/web/downloads/Устав.pdf"))
-// {
-// unlink("/home/vagrant/test/portal_local_repo/app/frontend/web/downloads/Устав.pdf");
-// }
-// if (copy($saveuploadfile, $uploadfile)){
-//     // echo "Файл корректен и был успешно загружен.\n";
-//     // echo $uploaddir;
-// }
