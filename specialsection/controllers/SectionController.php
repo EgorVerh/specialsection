@@ -1723,6 +1723,7 @@ class SectionController extends Controller
     public function actionObjects()
     {
         $request = Yii::$app->request;
+
         if ($request->post()) {
             if ($request->post("tableobj")) {
                 foreach ($request->post("tableobj") as $obj) {
@@ -2484,6 +2485,7 @@ class SectionController extends Controller
                     $del = $extrafields::findOne($request->post("id"));
                     $del->delete();
                 }
+                break;
             case 7:
                 self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                 if ($request->post("id") && !$request->post("name")) {
@@ -2496,6 +2498,7 @@ class SectionController extends Controller
                     $del = $extrafields::findOne($request->post("id"));
                     $del->delete();
                 }
+                break;
             case 8:
                 self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                 if ($request->post("id") && !$request->post("name")) {
@@ -2508,6 +2511,7 @@ class SectionController extends Controller
                     $del = $extrafields::findOne($request->post("id"));
                     $del->delete();
                 }
+                break;
             case 9:
                 self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                 if ($request->post("id") && !$request->post("name")) {
@@ -2520,6 +2524,7 @@ class SectionController extends Controller
                     $del = $extrafields::findOne($request->post("id"));
                     $del->delete();
                 }
+                break;
             case 10:
                 self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                 if ($request->post("id") && !$request->post("name")) {
@@ -2532,6 +2537,7 @@ class SectionController extends Controller
                     $del = $extrafields::findOne($request->post("id"));
                     $del->delete();
                 }
+                break;
         }
     }
     public function actionDeletebudget()
@@ -2588,7 +2594,6 @@ class SectionController extends Controller
         $request = Yii::$app->request;
 
         switch ($request->post('whatisurl')) {
-
             case 8:
                 self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                 $table = new Dataforms();
@@ -2629,6 +2634,7 @@ class SectionController extends Controller
                         $table->save();
                     }
                 }
+                break;
             case 10:
                 self::checkPageDeleteAccess($request->post('whatisurl'), $trimmedNamesInRoles);
                 $table = new Dataforms();
@@ -2669,6 +2675,7 @@ class SectionController extends Controller
                         $table->save();
                     }
                 }
+                break;
         }
     }
     private function getFilteredMenuItems()
