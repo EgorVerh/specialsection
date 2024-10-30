@@ -12,9 +12,7 @@ $this->registerJsFile('@module_specialsection_js/budget.js');
 <head>
     <title>Финансово-хозяйственная деятельность</title>
 </head>
-<?php $assetManager = \Yii::$app->assetManager;
-        $publishedUrl = $assetManager->getPublishedUrl('@app/modules/specialsection/public');
-        echo $publishedUrl?>
+
 <body>
     <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
     <input type="hidden" id="whatisurl" value=6>

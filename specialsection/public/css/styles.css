@@ -326,10 +326,23 @@ tr {
 .dropdown:hover .dropdown-button {
     background-color: #D3D3D3;
 }
+
 /* Inter style */
 .rightbuttonposition_text {
     text-align: right;
 }
+
 .margin_for_dop {
     margin-bottom: 5px !important;
+}
+
+.li_oform {
+    margin: 15px 0 15px 0;
+    font-size: medium;
+}
+.li_oform a{
+    text-decoration: underline;
+}
+.li_oform:hover a{
+    text-decoration: none;
 }

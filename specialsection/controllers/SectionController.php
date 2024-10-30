@@ -1767,7 +1767,11 @@ class SectionController extends Controller
                                     break;
                             }
                             $saveintable->fieldsforms_id = $obj[0][$i];
-                            $saveintable->data = $obj[0][$i + 1];
+                            if (!empty($obj[0][$i + 1])) {
+                                $saveintable->data = $obj[0][$i + 1];
+                            } else {
+                                $saveintable->data = "0";
+                            }
                             $saveintable->type = $type;
                             $saveintable->save();
                         }

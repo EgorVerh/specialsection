@@ -12,11 +12,9 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
 <head>
     <title>Финансово-хозяйственная деятельность</title>
 </head>
-<?php $assetManager = \Yii::$app->assetManager;
-        $publishedUrl = $assetManager->getPublishedUrl('@app/modules/specialsection/public');
-        echo $publishedUrl?>
+
 <body>
-    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT,'items'=> $menuItems]) ?>
+    <?= MenuSectionsWidget::widget(['type' => MenuSectionsWidget::TYPE_SELECT, 'items' => $menuItems]) ?>
     <input type="hidden" id="whatisurl" value=8>
     <h1>Финансово-хозяйственная деятельность</h1>
     <form method="post" enctype="multipart/form-data">
@@ -28,9 +26,10 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
             <h4>Сведения о библиотеках</h4>
             <?php foreach ($tables as $number => $row) {
                 if ($row["fieldsforms_id"] == 49) { ?>
-                    <input type="hidden" name="tableobj[<?php echo $number ?>][0][]" value="<?php echo $row["id"] ?>">
-                    <input type="hidden" name="tableobj[<?php echo $number ?>][0][]" value="<?php echo $row["fieldsforms_id"] ?>">
                     <div class="row oform_row temporarystyle">
+                        <input type="hidden" name="tableobj[<?php echo $number ?>][0][]" value="<?php echo $row["id"] ?>">
+                        <input type="hidden" name="tableobj[<?php echo $number ?>][0][]"
+                            value="<?php echo $row["fieldsforms_id"] ?>">
                         <div class="col-sm-3"><label for="NameObject"> Наименование объекта</label>
                             <input type="hidden" name="tableobj[<?php echo $number ?>][0][]"
                                 value="<?php echo $row["extraFields"][0]["id"] ?>">
@@ -75,9 +74,10 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
             <h4>Сведения об объектах спорта</h4>
             <?php foreach ($tables as $number => $row) {
                 if ($row["fieldsforms_id"] == 50) { ?>
-                    <input type="hidden" name="tableobj[<?php echo $number ?>][0][]" value="<?php echo $row["id"] ?>">
-                    <input type="hidden" name="tableobj[<?php echo $number ?>][0][]" value="<?php echo $row["fieldsforms_id"] ?>">
                     <div class="row oform_row temporarystyle">
+                        <input type="hidden" name="tableobj[<?php echo $number ?>][0][]" value="<?php echo $row["id"] ?>">
+                        <input type="hidden" name="tableobj[<?php echo $number ?>][0][]"
+                            value="<?php echo $row["fieldsforms_id"] ?>">
                         <div class="col-sm-3"><label for="NameObject"> Наименование объекта</label>
                             <input type="hidden" name="tableobj[<?php echo $number ?>][0][]"
                                 value="<?php echo $row["extraFields"][0]["id"] ?>">
@@ -223,7 +223,8 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
                             <button type="button" id="delurl" class="btn btn-danger delbutton" tabindex="-1"
                                 value='/delete_grants'>X</button>
                             <button type="button" id="hide_url" value='/delete_grants' class="hidebutton btn delbutton"
-                                tabindex="-1" style="background-color: #f5f5f5;"><i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i></button>
+                                tabindex="-1" style="background-color: #f5f5f5;"><i class="fa fa-eye-slash fa-2x"
+                                    aria-hidden="true"></i></button>
                         </div>
                     </div>
                     <?php $count_url++;
@@ -249,7 +250,8 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
                             <button type="button" id="delurl" class="btn btn-danger delbutton" tabindex="-1"
                                 value='/delete_grants'>X</button>
                             <button type="button" id="hide_url" value='/delete_grants' class="hidebutton btn delbutton"
-                                tabindex="-1" style="background-color: #f5f5f5;"><i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i></button>
+                                tabindex="-1" style="background-color: #f5f5f5;"><i class="fa fa-eye-slash fa-2x"
+                                    aria-hidden="true"></i></button>
                         </div>
                     </div>
                     <?php $count_url++;
@@ -280,7 +282,7 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
             <tr>
                 <td colspan="4">
                     <div class="content_alert alert-1c danger_oform">
-                    <i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i>
+                        <i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i>
                         <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы выгружаются из 1C</p>
                     </div>
@@ -303,7 +305,7 @@ $this->registerJsFile('@module_specialsection_js/objects.js');
             <tr>
                 <td colspan="4">
                     <div class="content_alert alert-1c danger_oform">
-                    <i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i>
+                        <i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i>
                         <p>ВНИМАНИЕ !</p>
                         <p>Поля для этой таблицы выгружаются из 1C</p>
                     </div>
