@@ -81,7 +81,7 @@ $this->registerJsFile('@module_specialsection_js/document.js');
             <input type="number" name="grants[7][]">
         <?php } ?>
         <h4>Приказ об установлении стипендий</h4>
-        <?php if (!empty($tabledata)) {
+        <?php if (isset($tabledata)) {
             foreach ($tabledata as $table) {
                 if ($table["fieldsforms_id"] == 5 && $table["enabled"] == 1) { ?>
                     <div class="row oform_row temporarystyle" value=<?php echo $count_row ?>>
